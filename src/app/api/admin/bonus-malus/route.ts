@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export async function GET() {
     try {
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
             return new NextResponse("Invalid request data.", { status: 400 });
         }
 
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
             const event = await tx.bonusMalusEvent.create({
                 data: { artistId, points: parseInt(points), description }
             });
@@ -85,7 +85,7 @@ export async function DELETE(req: Request) {
 
         const { artistId, points } = event;
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
             // 1. Delete event
             await tx.bonusMalusEvent.delete({ where: { id } });
 
