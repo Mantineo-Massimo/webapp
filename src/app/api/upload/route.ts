@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { put } from "@vercel/blob";
 
 export async function POST(req: Request) {
     try {
@@ -20,27 +19,20 @@ export async function POST(req: Request) {
             return new NextResponse("No file uploaded", { status: 400 });
         }
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-
-        // Save in public/uploads
+        // Upload to Vercel Blob
         const filename = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
-        const relativePath = `/uploads/${filename}`;
-        const absolutePath = join(process.cwd(), "public", "uploads", filename);
+        const blob = await put(`uploads/${filename}`, file, {
+            access: 'public',
+        });
 
-        // Ensure directory exists
-        await mkdir(join(process.cwd(), "public", "uploads"), { recursive: true });
+        console.log(`File uploaded to Vercel Blob: ${blob.url}`);
 
-        await writeFile(absolutePath, buffer);
-        console.log(`File uploaded to ${absolutePath}`);
-
-        return NextResponse.json({ url: relativePath });
+        return NextResponse.json({ url: blob.url });
     } catch (error: any) {
         console.error("UPLOAD_ERROR_DETAILS:", {
             message: error.message,
-            code: error.code,
             stack: error.stack
         });
-        return new NextResponse(`Errore Server: ${error.message}`, { status: 500 });
+        return new NextResponse(`Errore Server (Blob): ${error.message}`, { status: 500 });
     }
 }
