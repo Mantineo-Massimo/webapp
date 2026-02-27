@@ -8,7 +8,7 @@ export default async function Home() {
   const deadlineIso = settings?.draftDeadline ? settings.draftDeadline.toISOString() : null;
 
   return (
-    <main className="min-h-screen bg-blunotte text-white flex flex-col pt-56 md:pt-44 items-center">
+    <main className="min-h-screen text-white flex flex-col pt-56 md:pt-44 items-center">
 
       {/* Hero Section */}
       <section className="w-full px-6 flex flex-col items-center justify-center text-center max-w-5xl space-y-8 animate-fade-in">

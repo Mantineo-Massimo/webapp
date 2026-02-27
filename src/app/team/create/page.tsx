@@ -152,7 +152,7 @@ export default function CreateTeamPage() {
     if (status === "loading" || !initialFetchDone) return <div className="min-h-screen bg-blunotte flex items-center justify-center text-white">Caricamento...</div>;
 
     return (
-        <main className="min-h-screen bg-blunotte text-white p-6 md:p-12 pt-56 md:pt-44 pb-32 relative">
+        <main className="min-h-screen text-white p-6 md:p-12 pt-56 md:pt-44 pb-32 relative">
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* Sinistra: Lista Artisti */}

@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0f1c] text-white min-h-screen relative overflow-x-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-white min-h-screen relative overflow-x-hidden`}
       >
         {/* Animated Background Orbs */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
