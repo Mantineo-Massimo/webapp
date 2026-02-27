@@ -762,6 +762,70 @@ export default function AdminDashboard() {
                         </motion.div>
                     )}
 
+                    {/* HISTORY TAB */}
+                    {activeTab === "history" && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
+                            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                                <FiClock className="text-oro" /> Cronologia Operazioni
+                            </h2>
+                            {eventsLoading ? (
+                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento storico...</div>
+                            ) : (
+                                <div className="overflow-x-auto no-scrollbar">
+                                    <table className="w-full text-left">
+                                        <thead className="text-gray-500 text-xs font-black tracking-widest uppercase border-b border-gray-800">
+                                            <tr>
+                                                <th className="pb-4 px-4">ID Azione</th>
+                                                <th className="pb-4 px-4">Artista</th>
+                                                <th className="pb-4 px-4">Punti</th>
+                                                <th className="pb-4 px-4">Motivazione</th>
+                                                <th className="pb-4 px-4">Data e Ora</th>
+                                                <th className="pb-4 px-4 text-right">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-800">
+                                            {events.map(event => (
+                                                <tr key={event.id} className="hover:bg-white/5 transition-colors group">
+                                                    <td className="py-4 px-4 text-gray-500 font-mono text-[10px] uppercase">
+                                                        #{event.id.slice(0, 8)}...
+                                                    </td>
+                                                    <td className="py-4 px-4 font-bold">{event.artist?.name || "Eliminato"}</td>
+                                                    <td className="py-4 px-4">
+                                                        <span className={`font-mono font-black ${event.points >= 0 ? "text-green-400" : "text-red-500"}`}>
+                                                            {event.points > 0 ? `+${event.points}` : event.points}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 px-4 text-gray-300 text-sm">{event.description}</td>
+                                                    <td className="py-4 px-4 text-gray-400 font-medium text-xs">
+                                                        {new Date(event.createdAt).toLocaleString('it-IT', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </td>
+                                                    <td className="py-4 px-4 text-right">
+                                                        <button
+                                                            onClick={() => handleDeleteEvent(event.id)}
+                                                            className="p-2 text-gray-600 hover:text-red-500 transition-colors"
+                                                            title="Annulla operazione"
+                                                        >
+                                                            <FiTrash2 size={18} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {events.length === 0 && (
+                                                <tr><td colSpan={6} className="py-20 text-center text-gray-600 italic">Nessun evento registrato nello storico.</td></tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+
                     {/* SETTINGS TAB */}
                     {activeTab === "settings" && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl max-w-2xl mx-auto w-full">
