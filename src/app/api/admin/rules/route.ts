@@ -92,11 +92,47 @@ export async function DELETE(req: Request) {
 
         if (!id) return new NextResponse("Missing ID", { status: 400 });
 
-        await prisma.ruleDefinition.delete({
-            where: { id }
+        // Complex Reversion Logic
+        await prisma.$transaction(async (tx: any) => {
+            // 1. Find all events linked to this rule
+            const events = await tx.bonusMalusEvent.findMany({
+                where: { ruleId: id }
+            });
+
+            // 2. For each event, revert points from artists and teams
+            for (const event of events) {
+                // Subtract from Artist
+                await tx.artist.update({
+                    where: { id: event.artistId },
+                    data: { totalScore: { decrement: event.points } }
+                });
+
+                // Find teams with this artist
+                const teamsWithArtist = await tx.team.findMany({
+                    where: { artists: { some: { id: event.artistId } } },
+                    select: { id: true }
+                });
+
+                const teamIds = teamsWithArtist.map((t: { id: string }) => t.id);
+                if (teamIds.length > 0) {
+                    // Subtract from TeamLeague scores
+                    await tx.teamLeague.updateMany({
+                        where: { teamId: { in: teamIds } },
+                        data: { score: { decrement: event.points } }
+                    });
+                }
+
+                // Delete the event
+                await tx.bonusMalusEvent.delete({ where: { id: event.id } });
+            }
+
+            // 3. Finally delete the rule itself
+            await tx.ruleDefinition.delete({
+                where: { id }
+            });
         });
 
-        return new NextResponse("Deleted", { status: 200 });
+        return new NextResponse("Deleted and points storned", { status: 200 });
     } catch (error) {
         console.error("DELETE_RULE_ERROR", error);
         return new NextResponse("Internal Error", { status: 500 });

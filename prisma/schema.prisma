@@ -74,6 +74,8 @@ model BonusMalusEvent {
   description String
   createdBy   User?    @relation("AdminEvents", fields: [createdById], references: [id])
   createdById String?
+  rule        RuleDefinition? @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  ruleId      String?
   createdAt   DateTime @default(now())
 }
 
@@ -89,6 +91,7 @@ model RuleDefinition {
   title       String
   description String
   points      Int
+  events      BonusMalusEvent[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

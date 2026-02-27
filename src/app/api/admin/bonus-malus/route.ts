@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         if (!user || user.role !== "ADMIN") return new NextResponse("Forbidden", { status: 403 });
 
         const body = await req.json();
-        const { artistId, points, description } = body;
+        const { artistId, points, description, ruleId } = body;
 
         if (!artistId || points === undefined || !description) {
             return new NextResponse("Invalid request data.", { status: 400 });
@@ -47,7 +47,8 @@ export async function POST(req: Request) {
                     artistId,
                     points: parseInt(points),
                     description,
-                    createdById: user.id
+                    createdById: user.id,
+                    ruleId: ruleId || null
                 }
             });
 

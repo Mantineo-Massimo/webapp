@@ -230,7 +230,8 @@ export default function AdminDashboard() {
                 body: JSON.stringify({
                     artistId: selectedArtistId,
                     points: Number(points),
-                    description: description.trim()
+                    description: description.trim(),
+                    ruleId: rules.find(r => r.title === selectedPredefined)?.id || null
                 })
             });
 
