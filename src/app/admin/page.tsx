@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiUsers, FiStar, FiSettings, FiActivity, FiClock, FiPlus, FiTrash2, FiUpload, FiCheck, FiX } from "react-icons/fi";
+import { FiUsers, FiStar, FiSettings, FiActivity, FiClock, FiPlus, FiTrash2, FiUpload, FiCheck, FiX, FiList, FiEdit2 } from "react-icons/fi";
 
 type Artist = {
     id: string;
@@ -14,7 +14,15 @@ type Artist = {
     totalScore: number;
 };
 
-type Tab = "dashboard" | "artists" | "points" | "history" | "settings";
+type Tab = "dashboard" | "artists" | "points" | "regole" | "history" | "settings";
+
+type RuleDefinition = {
+    id: string;
+    category: string;
+    title: string;
+    description: string;
+    points: number;
+};
 
 export default function AdminDashboard() {
     const { data: session, status } = useSession();
@@ -46,6 +54,15 @@ export default function AdminDashboard() {
     // History State
     const [events, setEvents] = useState<any[]>([]);
     const [eventsLoading, setEventsLoading] = useState(false);
+
+    // Rules Management State
+    const [rules, setRules] = useState<RuleDefinition[]>([]);
+    const [ruleCategory, setRuleCategory] = useState("");
+    const [ruleTitle, setRuleTitle] = useState("");
+    const [ruleDescription, setRuleDescription] = useState("");
+    const [rulePoints, setRulePoints] = useState<number | "">("");
+    const [rulesLoading, setRulesLoading] = useState(false);
+    const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -85,11 +102,21 @@ export default function AdminDashboard() {
             .finally(() => setEventsLoading(false));
     };
 
+    const loadRules = () => {
+        setRulesLoading(true);
+        fetch("/api/admin/rules")
+            .then(res => res.json())
+            .then(data => setRules(data))
+            .catch(err => console.error(err))
+            .finally(() => setRulesLoading(false));
+    };
+
     useEffect(() => {
         if (session?.user?.role === "ADMIN") {
             loadArtists();
             loadSettings();
             loadEvents();
+            loadRules();
         }
     }, [session]);
 
@@ -175,50 +202,11 @@ export default function AdminDashboard() {
         }
     };
 
-    const predefinedRules = [
-        { title: "-- Scegli un bonus/malus dal regolamento --", points: 0 },
-        { title: "A cappella", points: 15 },
-        { title: "L'Acuto Spezza-Cristalli", points: 10 },
-        { title: "Standing Ovation", points: 20 },
-        { title: "Pelle d'Oca", points: 10 },
-        { title: "Dedicato a te", points: 5 },
-        { title: "Microfono a giraffa", points: 5 },
-        { title: "Il Batti le mani", points: 5 },
-        { title: "Vocalizzo selvaggio", points: 10 },
-        { title: "Spaccata Improvvisa", points: 15 },
-        { title: "Presa Acrobatica", points: 15 },
-        { title: "Sincro Perfetto", points: 10 },
-        { title: "Polvere di Fata", points: 10 },
-        { title: "Oggetto di Scena", points: 10 },
-        { title: "Coreografia in Platea", points: 15 },
-        { title: "Assolo Infuocato", points: 10 },
-        { title: "Mantello del Mistero", points: 10 },
-        { title: "Trasformismo", points: 20 },
-        { title: "Patto con l'Admin", points: 10 },
-        { title: "Dab con Parisi", points: 5 },
-        { title: "Il Simbolo Segreto", points: 15 },
-        { title: "Pioggia d'Applausi", points: 30 },
-        { title: "Incursione Animale", points: 50 },
-        { title: "Parenti Serpenti", points: 15 },
-        { title: "Il Bis", points: 10 },
-        { title: "Regalo dal Pubblico", points: 10 },
-        { title: "Nudo ma non Crudo", points: -20 },
-        { title: "Caduta del Microfono", points: -10 },
-        { title: "Audio Fantasma", points: -15 },
-        { title: "Gelo in Piazza", points: -10 },
-        { title: "Autogol", points: -10 },
-        { title: "L'Orologio", points: -10 },
-        { title: "Polemica in Diretta", points: -20 },
-        { title: "Il Fuori Tempo", points: -5 },
-        { title: "Vittoria Assoluta", points: 50 },
-        { title: "Ultimo Posto", points: 10 },
-    ];
-
     const handlePredefinedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const title = e.target.value;
         setSelectedPredefined(title);
-        const rule = predefinedRules.find(r => r.title === title);
-        if (rule && title !== predefinedRules[0].title) {
+        const rule = rules.find(r => r.title === title);
+        if (rule) {
             setPoints(rule.points);
             setDescription(rule.title);
         }
@@ -310,6 +298,74 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleRuleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!ruleCategory || !ruleTitle || !ruleDescription || rulePoints === "") {
+            setError("Compila tutti i campi della regola.");
+            return;
+        }
+
+        setRulesLoading(true);
+        setError("");
+        setSuccess("");
+
+        try {
+            const method = editingRuleId ? "PUT" : "POST";
+            const res = await fetch("/api/admin/rules", {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: editingRuleId,
+                    category: ruleCategory,
+                    title: ruleTitle,
+                    description: ruleDescription,
+                    points: Number(rulePoints)
+                })
+            });
+
+            if (!res.ok) throw new Error("Errore durante il salvataggio della regola");
+
+            setSuccess(editingRuleId ? "Regola aggiornata." : "Regola aggiunta.");
+            setRuleCategory("");
+            setRuleTitle("");
+            setRuleDescription("");
+            setRulePoints("");
+            setEditingRuleId(null);
+            loadRules();
+            setTimeout(() => setSuccess(""), 4000);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setRulesLoading(false);
+        }
+    };
+
+    const handleDeleteRule = async (id: string, title: string) => {
+        if (!confirm(`Vuoi davvero eliminare la regola "${title}"?`)) return;
+
+        setRulesLoading(true);
+        try {
+            const res = await fetch(`/api/admin/rules?id=${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Errore durante l'eliminazione.");
+            setSuccess("Regola eliminata.");
+            loadRules();
+            setTimeout(() => setSuccess(""), 4000);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setRulesLoading(false);
+        }
+    };
+
+    const startEditingRule = (rule: RuleDefinition) => {
+        setEditingRuleId(rule.id);
+        setRuleCategory(rule.category);
+        setRuleTitle(rule.title);
+        setRuleDescription(rule.description);
+        setRulePoints(rule.points);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     if (status === "loading" || session?.user?.role !== "ADMIN") {
         return <div className="min-h-screen bg-blunotte flex items-center justify-center text-white">Verifica permessi in corso...</div>;
     }
@@ -317,6 +373,7 @@ export default function AdminDashboard() {
     const tabs = [
         { id: "dashboard", label: "Dashboard", icon: <FiActivity /> },
         { id: "artists", label: "Artisti", icon: <FiUsers /> },
+        { id: "regole", label: "Regole", icon: <FiList /> },
         { id: "points", label: "Punti", icon: <FiStar /> },
         { id: "history", label: "Storico", icon: <FiClock /> },
         { id: "settings", label: "Impostazioni", icon: <FiSettings /> },
@@ -515,9 +572,10 @@ export default function AdminDashboard() {
                                                 onChange={handlePredefinedChange}
                                                 className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro transition-colors appearance-none"
                                             >
-                                                {predefinedRules.map((rule, idx) => (
-                                                    <option key={idx} value={rule.title}>
-                                                        {rule.title} {rule.points !== 0 ? `(${rule.points > 0 ? '+' : ''}${rule.points})` : ''}
+                                                <option value="">-- Scegli dal regolamento --</option>
+                                                {rules.map((rule, idx) => (
+                                                    <option key={rule.id} value={rule.title}>
+                                                        {rule.title} ({rule.points > 0 ? '+' : ''}{rule.points})
                                                     </option>
                                                 ))}
                                             </select>
@@ -573,54 +631,134 @@ export default function AdminDashboard() {
                         </motion.div>
                     )}
 
-                    {/* HISTORY TAB */}
-                    {activeTab === "history" && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
-                            <h2 className="text-2xl font-bold mb-8">Cronologia Punteggi</h2>
-                            {eventsLoading ? (
-                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento storico...</div>
-                            ) : (
+                    {/* RULES TAB */}
+                    {activeTab === "regole" && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+                            <div className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl">
+                                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                                    {editingRuleId ? <FiEdit2 className="text-oro" /> : <FiPlus className="text-oro" />}
+                                    {editingRuleId ? "Modifica Regola" : "Aggiungi Nuova Regola"}
+                                </h2>
+                                <form onSubmit={handleRuleSubmit} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-500 uppercase">Categoria</label>
+                                            <input
+                                                type="text"
+                                                value={ruleCategory}
+                                                onChange={e => setRuleCategory(e.target.value)}
+                                                placeholder="Canto, Danza, Malus..."
+                                                className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-1 space-y-2">
+                                            <label className="text-xs font-bold text-gray-500 uppercase">Titolo</label>
+                                            <input
+                                                type="text"
+                                                value={ruleTitle}
+                                                onChange={e => setRuleTitle(e.target.value)}
+                                                placeholder="Nome della regola..."
+                                                className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-500 uppercase">Punti</label>
+                                            <input
+                                                type="number"
+                                                value={rulePoints}
+                                                onChange={e => setRulePoints(e.target.value ? Number(e.target.value) : "")}
+                                                placeholder="es. 15 o -10"
+                                                className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Descrizione</label>
+                                        <textarea
+                                            value={ruleDescription}
+                                            onChange={e => setRuleDescription(e.target.value)}
+                                            placeholder="Spiegazione della regola..."
+                                            rows={2}
+                                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors resize-none"
+                                        />
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <button
+                                            type="submit"
+                                            disabled={rulesLoading}
+                                            className="flex-1 py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-red-600/20"
+                                        >
+                                            {rulesLoading ? "Salvataggio..." : editingRuleId ? "Aggiorna Regola" : "Salva Regola"}
+                                        </button>
+                                        {editingRuleId && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setEditingRuleId(null);
+                                                    setRuleCategory("");
+                                                    setRuleTitle("");
+                                                    setRuleDescription("");
+                                                    setRulePoints("");
+                                                }}
+                                                className="px-6 py-3.5 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-xl transition-all"
+                                            >
+                                                Annulla
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
+                                <h2 className="text-2xl font-bold mb-6">Regolamento Attuale ({rules.length})</h2>
                                 <div className="overflow-x-auto no-scrollbar">
                                     <table className="w-full text-left">
-                                        <thead className="text-gray-500 text-xs font-black tracking-widest uppercase border-b border-gray-800">
+                                        <thead className="text-gray-400 text-xs font-black uppercase tracking-widest border-b border-gray-800">
                                             <tr>
-                                                <th className="pb-4 px-4">Data</th>
-                                                <th className="pb-4 px-4">Artista</th>
-                                                <th className="pb-4 px-4">Valore</th>
-                                                <th className="pb-4 px-4">Motivazione</th>
+                                                <th className="pb-4 px-4">Titolo</th>
+                                                <th className="pb-4 px-4">Categoria</th>
+                                                <th className="pb-4 px-4 text-center">Punti</th>
                                                 <th className="pb-4 px-4 text-right">Azioni</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-800">
-                                            {events.map(event => (
-                                                <tr key={event.id} className="hover:bg-white/5 transition-colors group">
-                                                    <td className="py-4 px-4 text-gray-400 font-mono text-xs">
-                                                        {new Date(event.createdAt).toLocaleDateString('it-IT')}
-                                                    </td>
-                                                    <td className="py-4 px-4 font-bold">{event.artist.name}</td>
+                                            {rules.map(r => (
+                                                <tr key={r.id} className="hover:bg-white/5 transition-colors group">
                                                     <td className="py-4 px-4">
-                                                        <span className={`font-mono font-black ${event.points >= 0 ? "text-green-400" : "text-red-500"}`}>
-                                                            {event.points > 0 ? `+${event.points}` : event.points}
+                                                        <div className="font-bold">{r.title}</div>
+                                                        <div className="text-xs text-gray-500 line-clamp-1">{r.description}</div>
+                                                    </td>
+                                                    <td className="py-4 px-4 text-sm text-gray-400 uppercase tracking-wider">{r.category}</td>
+                                                    <td className="py-4 px-4 text-center font-mono font-bold">
+                                                        <span className={r.points >= 0 ? "text-green-400" : "text-red-500"}>
+                                                            {r.points > 0 ? `+${r.points}` : r.points}
                                                         </span>
                                                     </td>
-                                                    <td className="py-4 px-4 text-gray-400 text-sm italic">{event.description}</td>
                                                     <td className="py-4 px-4 text-right">
-                                                        <button
-                                                            onClick={() => handleDeleteEvent(event.id)}
-                                                            className="p-2 text-gray-600 hover:text-red-500 transition-colors"
-                                                        >
-                                                            <FiTrash2 size={18} />
-                                                        </button>
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                onClick={() => startEditingRule(r)}
+                                                                className="p-2 text-gray-600 hover:text-oro transition-colors"
+                                                            >
+                                                                <FiEdit2 size={18} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteRule(r.id, r.title)}
+                                                                className="p-2 text-gray-600 hover:text-red-500 transition-colors"
+                                                            >
+                                                                <FiTrash2 size={18} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
-                                            {events.length === 0 && (
-                                                <tr><td colSpan={5} className="py-20 text-center text-gray-600 italic">Nessun evento registrato.</td></tr>
+                                            {rules.length === 0 && (
+                                                <tr><td colSpan={4} className="py-20 text-center text-gray-600 italic">Nessuna regola definita.</td></tr>
                                             )}
                                         </tbody>
                                     </table>
                                 </div>
-                            )}
+                            </div>
                         </motion.div>
                     )}
 
