@@ -79,11 +79,13 @@ export async function POST(req: Request) {
                 }
             });
 
-            // 2. Enroll the team in all leagues
+            // 2. Enroll the team in all leagues with current points
+            const initialScore = artists.reduce((sum: number, a: { totalScore: number }) => sum + a.totalScore, 0);
+
             const teamLeaguesData = leagues.map((league: { id: string }) => ({
                 teamId: newTeam.id,
                 leagueId: league.id,
-                score: 0
+                score: initialScore
             }));
 
             await tx.teamLeague.createMany({
@@ -186,15 +188,30 @@ export async function PUT(req: Request) {
             return new NextResponse("Team name already taken", { status: 409 });
         }
 
-        // Update team
-        const updatedTeam = await prisma.team.update({
-            where: { id: existingTeam.id },
-            data: {
-                name: teamName,
-                artists: {
-                    set: artists.map((a: { id: string }) => ({ id: a.id }))
+        // Update team and its score in leagues
+        const updatedScore = artists.reduce((sum: number, a: { totalScore: number }) => sum + a.totalScore, 0);
+
+        const updatedTeam = await prisma.$transaction(async (tx) => {
+            // 1. Update team artists
+            const team = await tx.team.update({
+                where: { id: existingTeam.id },
+                data: {
+                    name: teamName,
+                    artists: {
+                        set: artistIds.map((id: string) => ({ id }))
+                    }
                 }
-            }
+            });
+
+            // 2. Update scores in all leagues
+            await tx.teamLeague.updateMany({
+                where: { teamId: existingTeam.id },
+                data: {
+                    score: updatedScore
+                }
+            });
+
+            return team;
         });
 
         return NextResponse.json(updatedTeam);
