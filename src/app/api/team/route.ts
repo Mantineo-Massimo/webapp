@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { teamName, artistIds } = body;
+        const { teamName, artistIds, image } = body;
 
         // Validation
         if (!teamName || !artistIds || artistIds.length !== 5) {
@@ -72,6 +72,7 @@ export async function POST(req: Request) {
             const newTeam = await tx.team.create({
                 data: {
                     name: teamName,
+                    image: image || null,
                     userId: user.id,
                     artists: {
                         connect: artists.map((a: { id: string }) => ({ id: a.id }))
@@ -146,7 +147,7 @@ export async function PUT(req: Request) {
         }
 
         const body = await req.json();
-        const { teamName, artistIds } = body;
+        const { teamName, artistIds, image } = body;
 
         if (!teamName || !artistIds || artistIds.length !== 5) {
             return new NextResponse("Invalid request data", { status: 400 });
@@ -191,12 +192,13 @@ export async function PUT(req: Request) {
         // Update team and its score in leagues
         const updatedScore = artists.reduce((sum: number, a: { totalScore: number }) => sum + a.totalScore, 0);
 
-        const updatedTeam = await prisma.$transaction(async (tx) => {
+        const updatedTeam = await prisma.$transaction(async (tx: any) => {
             // 1. Update team artists
             const team = await tx.team.update({
                 where: { id: existingTeam.id },
                 data: {
                     name: teamName,
+                    image: image || null,
                     artists: {
                         set: artistIds.map((id: string) => ({ id }))
                     }

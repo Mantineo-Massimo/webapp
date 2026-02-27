@@ -22,6 +22,7 @@ type TeamResult = {
     score: number;
     team: {
         name: string;
+        image?: string | null;
         artists: Artist[];
     };
 };
@@ -100,7 +101,16 @@ export default function LeaderboardsPage() {
                                                     index === 2 ? <span className="text-2xl">🥉</span> :
                                                         <span className="font-mono text-gray-400 ml-2">{index + 1}</span>}
                                         </td>
-                                        <td className="px-6 py-4 font-bold text-lg">{t.team.name}</td>
+                                        <td className="px-6 py-4 flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-[#0a0f1c] border border-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                                {t.team.image ? (
+                                                    <img src={t.team.image} alt={t.team.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <img src="/fanta-logo.png" alt="Default" className="w-full h-full object-contain p-1.5 opacity-40 shrink-0" />
+                                                )}
+                                            </div>
+                                            <span className="font-bold text-lg">{t.team.name}</span>
+                                        </td>
                                         <td className="px-6 py-4 text-right font-mono text-xl font-bold text-oro">{t.score} pt</td>
                                     </motion.tr>
                                 ))}
@@ -135,11 +145,21 @@ export default function LeaderboardsPage() {
                                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                                 className="relative bg-[#131d36] w-full max-w-lg rounded-3xl border border-gray-700 shadow-2xl overflow-hidden p-8 z-10"
                             >
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-black text-oro">{selectedTeam.team.name}</h2>
+                                <div className="flex items-center gap-6 mb-8">
+                                    <div className="w-24 h-24 rounded-3xl bg-[#0a0f1c] border-2 border-oro/30 overflow-hidden flex items-center justify-center shrink-0">
+                                        {selectedTeam.team.image ? (
+                                            <img src={selectedTeam.team.image} alt={selectedTeam.team.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <img src="/fanta-logo.png" alt="Default" className="w-full h-full object-contain p-3 opacity-40" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h2 className="text-3xl font-black text-oro">{selectedTeam.team.name}</h2>
+                                        <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mt-1">Squadra FantaPiazza</p>
+                                    </div>
                                     <button
                                         onClick={() => setSelectedTeam(null)}
-                                        className="text-gray-400 hover:text-white transition-colors"
+                                        className="text-gray-400 hover:text-white transition-colors p-2 bg-white/5 rounded-full self-start"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

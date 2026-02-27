@@ -22,6 +22,8 @@ export default function CreateTeamPage() {
     const [artists, setArtists] = useState<Artist[]>([]);
     const [selectedArtists, setSelectedArtists] = useState<Artist[]>([]);
     const [teamName, setTeamName] = useState("");
+    const [teamImage, setTeamImage] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -50,6 +52,7 @@ export default function CreateTeamPage() {
                 if (data && data.id) {
                     setIsEditing(true);
                     setTeamName(data.name);
+                    setTeamImage(data.image || null);
                     setSelectedArtists(data.artists || []);
                 }
                 setInitialFetchDone(true);
@@ -108,6 +111,32 @@ export default function CreateTeamPage() {
         }
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        setError("");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!res.ok) throw new Error("Errore durante l'upload");
+            const data = await res.json();
+            setTeamImage(data.url);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     const saveTeam = async () => {
         if (isExpired) {
             setError("Le iscrizioni sono chiuse!");
@@ -132,6 +161,7 @@ export default function CreateTeamPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     teamName: teamName,
+                    image: teamImage,
                     artistIds: selectedArtists.map(a => a.id)
                 })
             });
@@ -233,7 +263,27 @@ export default function CreateTeamPage() {
                         <h2 className="text-2xl font-bold mb-6 border-b border-gray-800 pb-4">Riepilogo</h2>
 
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-400 mb-2">Nome Squadra</label>
+                            <label className="block text-sm font-medium text-gray-400 mb-2 uppercase tracking-widest font-bold">Immagine della Squadra</label>
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-20 h-20 rounded-2xl bg-[#0a0f1c] border border-gray-700 overflow-hidden flex items-center justify-center relative shrink-0">
+                                    {teamImage ? (
+                                        <img src={teamImage} alt="Team" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <img src="/fanta-logo.png" alt="Default Logo" className="w-full h-full object-contain p-2 opacity-50" />
+                                    )}
+                                    {isUploading && (
+                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                        </div>
+                                    )}
+                                </div>
+                                <label className="flex-1 flex flex-col items-center justify-center py-2 px-4 bg-gray-800 hover:bg-gray-700 rounded-xl cursor-pointer transition-colors border border-gray-600 text-xs font-bold text-gray-300 gap-1">
+                                    <span>{teamImage ? "Cambia Foto" : "Carica Foto"}</span>
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading || isExpired} />
+                                </label>
+                            </div>
+
+                            <label className="block text-sm font-medium text-gray-400 mb-2 uppercase tracking-widest font-bold">Nome Squadra</label>
                             <input
                                 type="text"
                                 value={teamName}
