@@ -324,7 +324,7 @@ export default function AdminDashboard() {
 
     return (
         <main className="min-h-screen bg-blunotte text-white pb-32">
-            <div className="max-w-6xl mx-auto px-6 pt-40 md:pt-32">
+            <div className="max-w-6xl mx-auto px-6 pt-56 md:pt-44">
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">

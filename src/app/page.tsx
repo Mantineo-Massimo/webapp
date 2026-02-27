@@ -8,7 +8,7 @@ export default async function Home() {
   const deadlineIso = settings?.draftDeadline ? settings.draftDeadline.toISOString() : null;
 
   return (
-    <main className="min-h-screen bg-blunotte text-white flex flex-col pt-44 md:pt-28 items-center">
+    <main className="min-h-screen bg-blunotte text-white flex flex-col pt-56 md:pt-44 items-center">
 
       {/* Hero Section */}
       <section className="w-full px-6 flex flex-col items-center justify-center text-center max-w-5xl space-y-8 animate-fade-in">
@@ -16,9 +16,9 @@ export default async function Home() {
           <Image
             src="/fanta-logo.png"
             alt="FantaPiazza Logo"
-            width={400}
-            height={150}
-            className="w-full max-w-md mx-auto drop-shadow-[0_0_20px_rgba(255,215,0,0.4)]"
+            width={600}
+            height={225}
+            className="w-full max-w-2xl mx-auto drop-shadow-[0_0_20px_rgba(255,215,0,0.4)]"
             priority
           />
         </div>

@@ -63,7 +63,7 @@ export default function LeaderboardsPage() {
     const currentLeague = leagues.find(l => l.name === activeTab);
 
     return (
-        <main className="min-h-screen bg-blunotte text-white p-6 md:p-12 pt-48 md:pt-32 pb-32">
+        <main className="min-h-screen bg-blunotte text-white p-6 md:p-12 pt-56 md:pt-44 pb-32">
             <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Classifiche della <span className="text-oro">Piazza</span></h1>

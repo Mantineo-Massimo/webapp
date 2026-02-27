@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
@@ -9,6 +10,15 @@ import { FiHome, FiList, FiPlus, FiLogOut, FiSettings, FiBookOpen } from "react-
 export default function Navbar() {
     const { data: session, status } = useSession();
     const pathname = usePathname();
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     if (pathname.startsWith("/auth")) return null; // Nascondi in login/register
 
@@ -27,17 +37,19 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="fixed top-0 w-full bg-[#0a0f1c]/70 backdrop-blur-xl border-b border-gray-800/50 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-20 items-center">
+        <nav className={`fixed top-0 w-full backdrop-blur-xl border-b border-gray-800/50 z-50 transition-all duration-500 ${scrolled ? "h-16 bg-[#0a0f1c]/90" : "h-24 md:h-32 bg-[#0a0f1c]/60"
+            }`}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                <div className="flex justify-between h-full items-center">
                     <div className="flex items-center">
                         <Link href="/" className="flex-shrink-0 flex items-center group">
                             <Image
                                 src="/fanta-logo.png"
                                 alt="FantaPiazza Logo"
-                                width={160}
-                                height={60}
-                                className="h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] group-hover:drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-300"
+                                width={240}
+                                height={90}
+                                className={`w-auto object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] group-hover:drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-500 ${scrolled ? "h-10 md:h-12" : "h-14 md:h-20"
+                                    }`}
                             />
                         </Link>
                     </div>
