@@ -6,11 +6,13 @@ import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import CountdownTimer from "@/components/CountdownTimer";
+import ArmoniIcon from "@/components/ArmoniIcon";
 
 type Artist = {
     id: string;
     name: string;
     cost: number;
+    image?: string | null;
     totalScore: number;
 };
 
@@ -190,19 +192,34 @@ export default function CreateTeamPage() {
                                         whileHover={{ scale: isDisabled ? 1 : 1.05 }}
                                         whileTap={{ scale: isDisabled ? 1 : 0.95 }}
                                         onClick={() => !isDisabled && toggleArtist(artist)}
-                                        className={`p-4 rounded-2xl border-2 transition-all ${isSelected
+                                        className={`rounded-2xl border-2 transition-all p-4 overflow-hidden relative ${isSelected
                                             ? "bg-[#1f2937] border-oro shadow-[0_0_15px_rgba(255,215,0,0.3)] cursor-pointer"
                                             : isDisabled
                                                 ? "bg-[#0f172a] border-gray-800 opacity-50 cursor-not-allowed"
                                                 : "bg-[#131d36] border-gray-800 hover:border-gray-500 cursor-pointer"
                                             }`}
                                     >
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-xl font-bold truncate pr-2">{artist.name}</h3>
-                                            <span className={`px-2 py-1 rounded-lg text-sm font-bold ${isSelected ? "bg-oro text-blunotte" : "bg-gray-800 text-gray-300"
-                                                }`}>
-                                                {artist.cost} Armoni
-                                            </span>
+                                        <div className="flex flex-col gap-4">
+                                            <div className="flex justify-between items-start">
+                                                <h3 className="text-xl font-bold truncate pr-2 z-10">{artist.name}</h3>
+                                                <span className={`px-2 py-1 rounded-lg text-sm font-bold z-10 flex items-center gap-1.5 ${isSelected ? "bg-oro text-blunotte" : "bg-gray-800 text-gray-300"
+                                                    }`}>
+                                                    {artist.cost} <ArmoniIcon size={16} />
+                                                </span>
+                                            </div>
+
+                                            {/* Artist Image Preview */}
+                                            <div className="h-40 w-full rounded-xl bg-[#0a0f1c] overflow-hidden">
+                                                {artist.image ? (
+                                                    <img src={artist.image} alt={artist.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-800">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                        </svg>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </motion.div>
                                 );
@@ -232,8 +249,8 @@ export default function CreateTeamPage() {
                         <div className="space-y-4 mb-8">
                             <div className="flex justify-between items-center text-lg">
                                 <span className="text-gray-400">Armoni Totali</span>
-                                <span className={`font-mono font-bold text-2xl ${remainingBudget < 0 ? "text-red-500" : remainingBudget <= 10 ? "text-ocra" : "text-green-500"}`}>
-                                    {remainingBudget} / 100
+                                <span className={`font-mono font-bold text-2xl flex items-center gap-2 ${remainingBudget < 0 ? "text-red-500" : remainingBudget <= 10 ? "text-ocra" : "text-green-500"}`}>
+                                    {remainingBudget} / 100 <ArmoniIcon size={24} />
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-lg">
@@ -251,7 +268,7 @@ export default function CreateTeamPage() {
                                 selectedArtists.map(a => (
                                     <div key={a.id} className="flex justify-between bg-[#0a0f1c] px-4 py-3 rounded-xl text-sm items-center border border-gray-800">
                                         <span className="font-medium text-gray-200">{a.name}</span>
-                                        <span className="text-oro font-bold text-lg">{a.cost}</span>
+                                        <span className="text-oro font-bold text-lg flex items-center gap-1.5">{a.cost} <ArmoniIcon size={16} /></span>
                                     </div>
                                 ))
                             )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ArmoniIcon from "@/components/ArmoniIcon";
 
 type ArtistEvent = {
     id: string;
@@ -157,16 +158,20 @@ export default function LeaderboardsPage() {
                                                 className="flex justify-between items-center py-4 cursor-pointer hover:bg-white/5 px-2 -mx-2 rounded-xl transition-colors group/artist"
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-[#1e293b] border border-gray-700 flex items-center justify-center text-oro font-bold text-sm group-hover/artist:border-oro transition-colors">
-                                                        {artist.name.charAt(0)}
+                                                    <div className="w-12 h-12 rounded-xl bg-[#1e293b] border border-gray-700 overflow-hidden flex-shrink-0 flex items-center justify-center text-oro font-bold text-sm group-hover/artist:border-oro transition-colors">
+                                                        {artist.image ? (
+                                                            <img src={artist.image} alt={artist.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            artist.name.charAt(0)
+                                                        )}
                                                     </div>
                                                     <div>
                                                         <span className="font-bold text-lg block">{artist.name}</span>
                                                         <span className="text-[10px] text-oro/60 uppercase font-black">Clicca per dettagli</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <span className="block font-mono text-xl font-bold text-oro">{artist.totalScore}</span>
+                                                <div className="text-right flex flex-col items-end">
+                                                    <span className="block font-mono text-xl font-bold text-oro flex items-center gap-1.5">{artist.totalScore} <ArmoniIcon size={18} /></span>
                                                     <span className="text-[10px] text-gray-500 uppercase font-black">Punti</span>
                                                 </div>
                                             </div>
@@ -201,9 +206,18 @@ export default function LeaderboardsPage() {
                                 className="relative bg-[#0f172a] w-full max-w-md rounded-3xl border border-oro/30 shadow-[0_0_40px_rgba(255,215,0,0.15)] overflow-hidden p-8 z-10"
                             >
                                 <div className="flex justify-between items-center mb-6">
-                                    <div>
-                                        <h2 className="text-2xl font-black text-oro">{selectedArtist.name}</h2>
-                                        <p className="text-gray-400 text-xs uppercase font-bold tracking-widest mt-1">Cronologia Bonus & Malus</p>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-16 h-16 rounded-2xl bg-[#1e293b] border border-oro/30 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                            {selectedArtist.image ? (
+                                                <img src={selectedArtist.image} alt={selectedArtist.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-2xl font-black text-oro">{selectedArtist.name.charAt(0)}</span>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-black text-oro">{selectedArtist.name}</h2>
+                                            <p className="text-gray-400 text-xs uppercase font-bold tracking-widest mt-1">Cronologia Bonus & Malus</p>
+                                        </div>
                                     </div>
                                     <button
                                         onClick={() => setSelectedArtist(null)}
@@ -223,8 +237,8 @@ export default function LeaderboardsPage() {
                                                     <p className="text-white text-sm leading-relaxed">{event.description}</p>
                                                     <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold">{new Date(event.createdAt).toLocaleDateString('it-IT')}</p>
                                                 </div>
-                                                <div className={`text-right font-mono font-black text-xl px-3 py-1 rounded-lg ${event.points >= 0 ? "text-green-500 bg-green-500/10" : "text-red-500 bg-red-500/10"}`}>
-                                                    {event.points > 0 ? `+${event.points}` : event.points}
+                                                <div className={`text-right font-mono font-black text-xl px-3 py-1 rounded-lg flex items-center gap-1.5 ${event.points >= 0 ? "text-green-500 bg-green-500/10" : "text-red-500 bg-red-500/10"}`}>
+                                                    {event.points > 0 ? `+${event.points}` : event.points} <ArmoniIcon size={18} />
                                                 </div>
                                             </div>
                                         ))

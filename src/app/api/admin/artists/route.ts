@@ -12,7 +12,7 @@ export async function POST(req: Request) {
         if (!user || user.role !== "ADMIN") return new NextResponse("Forbidden", { status: 403 });
 
         const body = await req.json();
-        const { name, cost } = body;
+        const { name, cost, image } = body;
 
         if (!name || cost === undefined) {
             return new NextResponse("Missing name or cost", { status: 400 });
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
             data: {
                 name,
                 cost: parseInt(cost),
+                image: image || null,
                 totalScore: 0
             }
         });
