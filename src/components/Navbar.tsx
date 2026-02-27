@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { FiHome, FiList, FiPlus, FiLogOut, FiSettings, FiBookOpen } from "react-icons/fi";
+import { FiHome, FiList, FiPlus, FiLogOut, FiSettings, FiBookOpen, FiUser } from "react-icons/fi";
 
 export default function Navbar() {
     const { data: session, status } = useSession();
@@ -30,6 +30,7 @@ export default function Navbar() {
 
     if (session) {
         navLinks.push({ href: "/team/create", label: "Mia Squadra", icon: FiPlus });
+        navLinks.push({ href: "/account", label: "Account", icon: FiUser });
 
         if (session.user?.role === "ADMIN") {
             navLinks.push({ href: "/admin", label: "Admin", icon: FiSettings });
