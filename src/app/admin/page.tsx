@@ -775,9 +775,19 @@ export default function AdminDashboard() {
                     {/* HISTORY TAB */}
                     {activeTab === "history" && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
-                            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                                <FiClock className="text-oro" /> Cronologia Operazioni
-                            </h2>
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-2xl font-bold flex items-center gap-3">
+                                    <FiClock className="text-oro" /> Cronologia Operazioni
+                                </h2>
+                                <button
+                                    onClick={loadEvents}
+                                    disabled={eventsLoading}
+                                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-gray-800 rounded-xl text-xs font-bold transition-all flex items-center gap-2"
+                                >
+                                    <FiActivity className={eventsLoading ? "animate-spin" : ""} />
+                                    Ricarica
+                                </button>
+                            </div>
                             {eventsLoading ? (
                                 <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento storico...</div>
                             ) : (
