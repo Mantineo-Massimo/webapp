@@ -84,6 +84,10 @@ export default function AdminDashboard() {
     const [teams, setTeams] = useState<any[]>([]);
     const [teamsLoading, setTeamsLoading] = useState(false);
 
+    // User Edit State
+    const [editingUser, setEditingUser] = useState<any>(null);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
     useEffect(() => {
         if (status === "unauthenticated") {
             router.push("/auth/login");
@@ -156,6 +160,49 @@ export default function AdminDashboard() {
             .then(data => setUsers(data))
             .catch(err => console.error(err))
             .finally(() => setUsersLoading(false));
+    };
+
+    const handleUpdateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const res = await fetch("/api/admin/users", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: editingUser.id,
+                    name: editingUser.name,
+                    role: editingUser.role
+                })
+            });
+
+            if (res.ok) {
+                setIsUserModalOpen(false);
+                setEditingUser(null);
+                loadUsers();
+            } else {
+                alert("Errore durante l'aggiornamento");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleDeleteUser = async (id: string, name: string) => {
+        if (!confirm(`Sei sicuro di voler eliminare l'utente ${name}? Questa azione è irreversibile.`)) return;
+
+        try {
+            const res = await fetch(`/api/admin/users?id=${id}`, {
+                method: "DELETE"
+            });
+
+            if (res.ok) {
+                loadUsers();
+            } else {
+                alert(await res.text() || "Errore durante l'eliminazione");
+            }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     useEffect(() => {
@@ -922,6 +969,7 @@ export default function AdminDashboard() {
                                                 <th className="pb-4 px-4">Ruolo</th>
                                                 <th className="pb-4 px-4">Squadra</th>
                                                 <th className="pb-4 px-4">Data Iscrizione</th>
+                                                <th className="pb-4 px-4 text-right">Azioni</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-800">
@@ -945,6 +993,25 @@ export default function AdminDashboard() {
                                                     </td>
                                                     <td className="py-4 px-4 text-xs text-gray-500">
                                                         {new Date(u.createdAt).toLocaleDateString('it-IT')}
+                                                    </td>
+                                                    <td className="py-4 px-4 text-right">
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingUser(u);
+                                                                    setIsUserModalOpen(true);
+                                                                }}
+                                                                className="p-2 text-gray-600 hover:text-oro transition-colors"
+                                                            >
+                                                                <FiEdit2 size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteUser(u.id, u.name || u.email)}
+                                                                className="p-2 text-gray-600 hover:text-red-500 transition-colors"
+                                                            >
+                                                                <FiTrash2 size={16} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -1032,6 +1099,70 @@ export default function AdminDashboard() {
                     )}
 
                 </div>
+                {/* User Edit Modal */}
+                {isUserModalOpen && editingUser && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-[#131d36] border border-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl"
+                        >
+                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                                <FiEdit2 className="text-oro" /> Modifica Utente
+                            </h2>
+                            <form onSubmit={handleUpdateUser} className="space-y-4">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Nome</label>
+                                    <input
+                                        type="text"
+                                        value={editingUser.name || ""}
+                                        onChange={e => setEditingUser({ ...editingUser, name: e.target.value })}
+                                        className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-oro"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Email</label>
+                                    <input
+                                        type="email"
+                                        value={editingUser.email}
+                                        disabled
+                                        className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-2 text-gray-500 cursor-not-allowed"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Ruolo</label>
+                                    <select
+                                        value={editingUser.role}
+                                        onChange={e => setEditingUser({ ...editingUser, role: e.target.value })}
+                                        className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-oro"
+                                    >
+                                        <option value="USER">USER</option>
+                                        <option value="ADMIN">ADMIN</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex gap-4 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsUserModalOpen(false);
+                                            setEditingUser(null);
+                                        }}
+                                        className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-xl transition-colors"
+                                    >
+                                        Annulla
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 py-3 bg-gradient-to-r from-oro to-ocra text-blunotte font-bold rounded-xl shadow-lg shadow-oro/10"
+                                    >
+                                        Salva
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
             </div>
         </main>
     );

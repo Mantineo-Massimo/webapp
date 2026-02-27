@@ -31,11 +31,9 @@ export default function Navbar() {
     if (status === "authenticated" && session) {
         navLinks.push({ href: "/team/create", label: "Mia Squadra", icon: FiPlus });
         navLinks.push({ href: "/account", label: "Account", icon: FiUser });
-
-        if (session.user?.role === "ADMIN") {
-            navLinks.push({ href: "/admin", label: "Admin", icon: FiSettings });
-        }
     }
+
+    const isAdmin = status === "authenticated" && session?.user?.role === "ADMIN";
 
     return (
         <nav className={`fixed top-0 w-full backdrop-blur-xl border-b border-gray-800/50 z-50 transition-all duration-500 ${scrolled ? "h-16 bg-[#0a0f1c]/90" : "h-24 md:h-32 bg-[#0a0f1c]/60"
@@ -74,6 +72,19 @@ export default function Navbar() {
                                 </Link>
                             );
                         })}
+
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 border border-purple-500/20 ${pathname.startsWith("/admin")
+                                    ? "text-purple-400 bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+                                    : "text-gray-400 hover:text-purple-300 hover:bg-purple-500/5"
+                                    }`}
+                            >
+                                <FiSettings size={18} className={pathname.startsWith("/admin") ? "text-purple-400" : "text-gray-500"} />
+                                Admin
+                            </Link>
+                        )}
 
                         {status === "authenticated" ? (
                             <button
@@ -120,6 +131,19 @@ export default function Navbar() {
                             </Link>
                         );
                     })}
+
+                    {isAdmin && (
+                        <Link
+                            href="/admin"
+                            className={`flex flex-col flex-shrink-0 items-center justify-center p-2 text-xs font-semibold transition-colors ${pathname.startsWith("/admin") ? "text-purple-400" : "text-gray-500"
+                                }`}
+                        >
+                            <div className={`p-2 rounded-xl mb-1 ${pathname.startsWith("/admin") ? "bg-purple-500/10" : "bg-transparent"}`}>
+                                <FiSettings size={22} className={pathname.startsWith("/admin") ? "drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" : ""} />
+                            </div>
+                            Admin
+                        </Link>
+                    )}
                 </div>
             </div>
         </nav>
