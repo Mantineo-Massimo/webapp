@@ -47,9 +47,9 @@ export default function Navbar() {
                             <Image
                                 src="/fanta-logo.png"
                                 alt="FantaPiazza Logo"
-                                width={240}
-                                height={90}
-                                className={`w-auto object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] group-hover:drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-500 ${scrolled ? "h-10 md:h-12" : "h-14 md:h-20"
+                                width={400}
+                                height={150}
+                                className={`w-auto object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] group-hover:drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] transition-all duration-500 ${scrolled ? "h-12 md:h-14" : "h-20 md:h-28"
                                     }`}
                             />
                         </Link>

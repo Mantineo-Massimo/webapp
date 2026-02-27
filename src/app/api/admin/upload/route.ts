@@ -22,7 +22,7 @@ export async function POST(req: Request) {
         // Upload to Vercel Blob
         const filename = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
         const blob = await put(`artists/${filename}`, file, {
-            access: 'private',
+            access: 'public',
         });
 
         console.log(`File uploaded to Vercel Blob: ${blob.url}`);

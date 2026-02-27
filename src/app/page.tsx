@@ -16,9 +16,9 @@ export default async function Home() {
           <Image
             src="/fanta-logo.png"
             alt="FantaPiazza Logo"
-            width={600}
-            height={225}
-            className="w-full max-w-2xl mx-auto drop-shadow-[0_0_20px_rgba(255,215,0,0.4)]"
+            width={800}
+            height={300}
+            className="w-full max-w-4xl mx-auto drop-shadow-[0_0_30px_rgba(255,215,0,0.4)]"
             priority
           />
         </div>
