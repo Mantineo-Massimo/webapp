@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  team      Team?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Artist {
+  id         String   @id @default(uuid())
+  name       String
+  cost       Int
+  image      String?
+  totalScore Int      @default(0)
+  teams      Team[]   @relation("TeamArtists")
+  events     BonusMalusEvent[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  artists   Artist[] @relation("TeamArtists")
+  leagues   TeamLeague[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model League {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  teams     TeamLeague[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TeamLeague {
+  id        String   @id @default(uuid())
+  team      Team     @relation(fields: [teamId], references: [id])
+  teamId    String
+  league    League   @relation(fields: [leagueId], references: [id])
+  leagueId  String
+  score     Int      @default(0)
+
+  @@unique([teamId, leagueId])
+}
+
+model BonusMalusEvent {
+  id          String   @id @default(uuid())
+  artist      Artist   @relation(fields: [artistId], references: [id])
+  artistId    String
+  points      Int
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model SystemSettings {
+  id                String    @id @default(uuid())
+  draftDeadline     DateTime? 
+  updatedAt         DateTime  @updatedAt
+}

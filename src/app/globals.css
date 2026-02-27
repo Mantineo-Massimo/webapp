@@ -10,6 +10,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Temi FantaPiazza */
+  --color-oro: #FFD700;
+  --color-ocra: #CC7722;
+  --color-blunotte: #0f172a;
+  --color-viola: #581c87;
 }
 
 @media (prefers-color-scheme: dark) {
