@@ -7,7 +7,11 @@ export async function GET() {
             include: {
                 teams: {
                     include: {
-                        team: true,
+                        team: {
+                            include: {
+                                artists: true
+                            }
+                        },
                     },
                     orderBy: {
                         score: 'desc'

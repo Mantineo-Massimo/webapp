@@ -3,21 +3,32 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+type Artist = {
+    id: string;
+    name: string;
+    totalScore: number;
+    image?: string;
+};
+
+type TeamResult = {
+    score: number;
+    team: {
+        name: string;
+        artists: Artist[];
+    };
+};
+
 type League = {
     id: string;
     name: string;
-    teams: {
-        score: number;
-        team: {
-            name: string;
-        };
-    }[];
+    teams: TeamResult[];
 };
 
 export default function LeaderboardsPage() {
     const [leagues, setLeagues] = useState<League[]>([]);
     const [activeTab, setActiveTab] = useState<string>("");
     const [loading, setLoading] = useState(true);
+    const [selectedTeam, setSelectedTeam] = useState<TeamResult | null>(null);
 
     useEffect(() => {
         fetch("/api/leaderboards")
@@ -48,6 +59,7 @@ export default function LeaderboardsPage() {
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Classifiche della <span className="text-oro">Piazza</span></h1>
                     <p className="text-gray-400">Scopri chi domina nelle varie leghe di FantaPiazza.</p>
+                    <p className="text-oro/60 text-sm mt-2 animate-pulse font-bold uppercase tracking-tighter">💡 Clicca su una squadra per vedere i suoi Armoni</p>
                 </div>
 
 
@@ -70,7 +82,8 @@ export default function LeaderboardsPage() {
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="border-b border-gray-800/50 hover:bg-[#1f2937] transition-colors"
+                                        onClick={() => setSelectedTeam(t)}
+                                        className="border-b border-gray-800/50 hover:bg-[#1f2937] transition-colors cursor-pointer group"
                                     >
                                         <td className="px-6 py-4">
                                             {index === 0 ? <span className="text-2xl">🥇</span> :
@@ -96,6 +109,63 @@ export default function LeaderboardsPage() {
 
                 </div>
 
+                {/* Modal Dettaglio Squadra */}
+                <AnimatePresence>
+                    {selectedTeam && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setSelectedTeam(null)}
+                                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="relative bg-[#131d36] w-full max-w-lg rounded-3xl border border-gray-700 shadow-2xl overflow-hidden p-8 z-10"
+                            >
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-black text-oro">{selectedTeam.team.name}</h2>
+                                    <button
+                                        onClick={() => setSelectedTeam(null)}
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-gray-400 text-sm font-bold uppercase tracking-widest">Gli Armoni della squadra</h3>
+                                    <div className="divide-y divide-gray-800/50">
+                                        {selectedTeam.team.artists.map((artist) => (
+                                            <div key={artist.id} className="flex justify-between items-center py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-[#1e293b] border border-gray-700 flex items-center justify-center text-oro font-bold text-sm">
+                                                        {artist.name.charAt(0)}
+                                                    </div>
+                                                    <span className="font-bold text-lg">{artist.name}</span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="block font-mono text-xl font-bold text-oro">{artist.totalScore}</span>
+                                                    <span className="text-[10px] text-gray-500 uppercase font-black">Punti</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-gray-800 flex justify-between items-center">
+                                    <span className="text-gray-400 font-bold">Punteggio Totale</span>
+                                    <span className="text-3xl font-black text-oro">{selectedTeam.score} pt</span>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
             </div>
         </main>
     );
