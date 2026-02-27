@@ -503,20 +503,24 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Tabs Navigation */}
-                    <div className="flex bg-[#131d36] p-1.5 rounded-2xl border border-gray-800 overflow-x-auto no-scrollbar">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id as Tab)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap font-bold text-sm ${activeTab === tab.id
-                                    ? "bg-red-600 text-white shadow-lg shadow-red-600/20"
-                                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                                    }`}
-                            >
-                                {tab.icon}
-                                {tab.label}
-                            </button>
-                        ))}
+                    <div className="flex bg-[#0a0f1c]/80 backdrop-blur-xl p-1 rounded-2xl border border-gray-800/50 shadow-2xl overflow-x-auto no-scrollbar">
+                        <div className="flex gap-1">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as Tab)}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all whitespace-nowrap font-bold text-xs uppercase tracking-widest ${activeTab === tab.id
+                                        ? "bg-red-600 text-white shadow-lg shadow-red-600/30"
+                                        : "text-gray-500 hover:text-gray-200 hover:bg-white/5"
+                                        }`}
+                                >
+                                    <span className={activeTab === tab.id ? "text-white" : "text-gray-400"}>
+                                        {tab.icon}
+                                    </span>
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

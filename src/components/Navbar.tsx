@@ -73,19 +73,6 @@ export default function Navbar() {
                             );
                         })}
 
-                        {isAdmin && (
-                            <Link
-                                href="/admin"
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 border border-purple-500/20 ${pathname.startsWith("/admin")
-                                    ? "text-purple-400 bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
-                                    : "text-gray-400 hover:text-purple-300 hover:bg-purple-500/5"
-                                    }`}
-                            >
-                                <FiSettings size={18} className={pathname.startsWith("/admin") ? "text-purple-400" : "text-gray-500"} />
-                                Admin
-                            </Link>
-                        )}
-
                         {status === "authenticated" ? (
                             <button
                                 onClick={() => signOut()}
@@ -111,6 +98,24 @@ export default function Navbar() {
                 </div>
             </div>
 
+            {/* Admin Sub-bar (Sotto il menù) */}
+            {isAdmin && (
+                <div className="bg-[#1a1425]/80 border-t border-purple-500/20 backdrop-blur-xl animate-in fade-in slide-in-from-top-1 duration-500">
+                    <div className="max-w-7xl mx-auto px-4 h-9 flex items-center justify-center">
+                        <Link
+                            href="/admin"
+                            className={`flex items-center gap-2 px-6 h-full transition-all group ${pathname.startsWith("/admin")
+                                ? "bg-purple-500/10 text-purple-300"
+                                : "text-purple-400/70 hover:text-purple-300"
+                                }`}
+                        >
+                            <FiSettings size={14} className="group-hover:rotate-90 transition-transform duration-500" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Pannello Amministrazione</span>
+                        </Link>
+                    </div>
+                </div>
+            )}
+
             {/* Mobile nav placeholder - espandibile */}
             <div className="md:hidden border-t border-gray-800/50 bg-[#060a12]/90 backdrop-blur-md">
                 <div className="flex overflow-x-auto py-3 px-4 gap-6 items-center justify-center hide-scrollbar">
@@ -132,18 +137,6 @@ export default function Navbar() {
                         );
                     })}
 
-                    {isAdmin && (
-                        <Link
-                            href="/admin"
-                            className={`flex flex-col flex-shrink-0 items-center justify-center p-2 text-xs font-semibold transition-colors ${pathname.startsWith("/admin") ? "text-purple-400" : "text-gray-500"
-                                }`}
-                        >
-                            <div className={`p-2 rounded-xl mb-1 ${pathname.startsWith("/admin") ? "bg-purple-500/10" : "bg-transparent"}`}>
-                                <FiSettings size={22} className={pathname.startsWith("/admin") ? "drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" : ""} />
-                            </div>
-                            Admin
-                        </Link>
-                    )}
                 </div>
             </div>
         </nav>
