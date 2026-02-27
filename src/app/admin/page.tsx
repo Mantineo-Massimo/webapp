@@ -96,9 +96,18 @@ export default function AdminDashboard() {
     const loadEvents = () => {
         setEventsLoading(true);
         fetch("/api/admin/bonus-malus")
-            .then(res => res.json())
+            .then(async res => {
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    throw new Error(`API Error ${res.status}: ${errorText}`);
+                }
+                return res.json();
+            })
             .then(data => setEvents(data))
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error("LOAD_EVENTS_ERROR", err);
+                setError("Impossibile caricare lo storico: " + err.message);
+            })
             .finally(() => setEventsLoading(false));
     };
 

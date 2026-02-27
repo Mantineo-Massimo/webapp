@@ -6,92 +6,92 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model User {
-  id        String   @id @default(uuid())
-  name      String?
-  email     String   @unique
+  id        String            @id @default(uuid())
+  email     String            @unique
   password  String
-  role      Role     @default(USER)
-  team      Team?
+  role      Role              @default(USER)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  name      String?
   events    BonusMalusEvent[] @relation("AdminEvents")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  team      Team?
 }
 
 model Artist {
-  id         String   @id @default(uuid())
+  id         String            @id @default(uuid())
   name       String
   cost       Int
   image      String?
-  totalScore Int      @default(0)
-  teams      Team[]   @relation("TeamArtists")
+  totalScore Int               @default(0)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
   events     BonusMalusEvent[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  teams      Team[]            @relation("TeamArtists")
 }
 
 model Team {
-  id        String   @id @default(uuid())
-  name      String   @unique
+  id        String       @id @default(uuid())
+  name      String       @unique
+  userId    String       @unique
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   image     String?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-  artists   Artist[] @relation("TeamArtists")
+  user      User         @relation(fields: [userId], references: [id])
   leagues   TeamLeague[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  artists   Artist[]     @relation("TeamArtists")
 }
 
 model League {
-  id        String   @id @default(uuid())
-  name      String   @unique
+  id        String       @id @default(uuid())
+  name      String       @unique
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   teams     TeamLeague[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model TeamLeague {
-  id        String   @id @default(uuid())
-  team      Team     @relation(fields: [teamId], references: [id])
-  teamId    String
-  league    League   @relation(fields: [leagueId], references: [id])
-  leagueId  String
-  score     Int      @default(0)
+  id       String @id @default(uuid())
+  teamId   String
+  leagueId String
+  score    Int    @default(0)
+  league   League @relation(fields: [leagueId], references: [id])
+  team     Team   @relation(fields: [teamId], references: [id])
 
   @@unique([teamId, leagueId])
 }
 
 model BonusMalusEvent {
-  id          String   @id @default(uuid())
-  artist      Artist   @relation(fields: [artistId], references: [id])
+  id          String          @id @default(uuid())
   artistId    String
   points      Int
   description String
-  createdBy   User?    @relation("AdminEvents", fields: [createdById], references: [id])
+  createdAt   DateTime        @default(now())
   createdById String?
-  rule        RuleDefinition? @relation(fields: [ruleId], references: [id], onDelete: SetNull)
   ruleId      String?
-  createdAt   DateTime @default(now())
+  artist      Artist          @relation(fields: [artistId], references: [id])
+  createdBy   User?           @relation("AdminEvents", fields: [createdById], references: [id])
+  rule        RuleDefinition? @relation(fields: [ruleId], references: [id])
 }
 
 model SystemSettings {
-  id                String    @id @default(uuid())
-  draftDeadline     DateTime? 
-  updatedAt         DateTime  @updatedAt
+  id            String    @id @default(uuid())
+  draftDeadline DateTime?
+  updatedAt     DateTime  @updatedAt
 }
 
 model RuleDefinition {
-  id          String   @id @default(uuid())
+  id          String            @id @default(uuid())
   category    String
   title       String
   description String
   points      Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   events      BonusMalusEvent[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
 }
