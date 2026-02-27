@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiUsers, FiStar, FiSettings, FiActivity, FiClock, FiPlus, FiTrash2, FiUpload, FiCheck, FiX } from "react-icons/fi";
-import ArmoniIcon from "@/components/ArmoniIcon";
 
 type Artist = {
     id: string;
@@ -481,9 +480,7 @@ export default function AdminDashboard() {
                                                         </div>
                                                         <span className="font-bold text-lg">{a.name}</span>
                                                     </td>
-                                                    <td className="py-4 px-4 text-center font-mono text-oro font-bold flex items-center justify-center gap-1.5">
-                                                        {a.cost} <ArmoniIcon size={16} />
-                                                    </td>
+                                                    <td className="py-4 px-4 text-center font-mono text-oro font-bold">{a.cost}</td>
                                                     <td className="py-4 px-4 text-center font-mono font-bold">{a.totalScore}</td>
                                                     <td className="py-4 px-4 text-right">
                                                         <button

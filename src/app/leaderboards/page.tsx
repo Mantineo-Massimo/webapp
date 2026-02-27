@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ArmoniIcon from "@/components/ArmoniIcon";
 
 type ArtistEvent = {
     id: string;
@@ -170,8 +169,8 @@ export default function LeaderboardsPage() {
                                                         <span className="text-[10px] text-oro/60 uppercase font-black">Clicca per dettagli</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-right flex flex-col items-end">
-                                                    <span className="block font-mono text-xl font-bold text-oro flex items-center gap-1.5">{artist.totalScore} <ArmoniIcon size={18} /></span>
+                                                <div className="text-right">
+                                                    <span className="block font-mono text-xl font-bold text-oro">{artist.totalScore}</span>
                                                     <span className="text-[10px] text-gray-500 uppercase font-black">Punti</span>
                                                 </div>
                                             </div>
@@ -237,8 +236,8 @@ export default function LeaderboardsPage() {
                                                     <p className="text-white text-sm leading-relaxed">{event.description}</p>
                                                     <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold">{new Date(event.createdAt).toLocaleDateString('it-IT')}</p>
                                                 </div>
-                                                <div className={`text-right font-mono font-black text-xl px-3 py-1 rounded-lg flex items-center gap-1.5 ${event.points >= 0 ? "text-green-500 bg-green-500/10" : "text-red-500 bg-red-500/10"}`}>
-                                                    {event.points > 0 ? `+${event.points}` : event.points} <ArmoniIcon size={18} />
+                                                <div className={`text-right font-mono font-black text-xl px-3 py-1 rounded-lg ${event.points >= 0 ? "text-green-500 bg-green-500/10" : "text-red-500 bg-red-500/10"}`}>
+                                                    {event.points > 0 ? `+${event.points}` : event.points}
                                                 </div>
                                             </div>
                                         ))
