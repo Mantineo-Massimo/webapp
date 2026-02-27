@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { sendEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
     try {
@@ -27,6 +28,23 @@ export async function POST(req: Request) {
                 password: hashedPassword,
             }
         });
+
+        // Send Welcome Email
+        try {
+            await sendEmail({
+                to: email,
+                subject: "Benvenuto su FantaPiazza! 🎠",
+                body: `
+                    <h2 style="color: #bc9c5d;">Benvenuto in FantaPiazza!</h2>
+                    <p>Siamo felici di averti con noi.</p>
+                    <p>Ora puoi iniziare a costruire la tua squadra, selezionando i tuoi 5 artisti preferiti e partecipando alla lega ufficiale.</p>
+                    <hr/>
+                    <p>Il Team di FantaPiazza</p>
+                `
+            });
+        } catch (err) {
+            console.error("WELCOME_EMAIL_ERROR", err);
+        }
 
         return NextResponse.json({ id: user.id, email: user.email, role: user.role });
     } catch (error) {

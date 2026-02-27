@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { sendEmail } from "@/lib/email";
 
 export async function GET() {
     try {
@@ -41,6 +42,27 @@ export async function POST(req: Request) {
                 points: parseInt(points)
             }
         });
+
+        // Notify Users (Async)
+        try {
+            const users = await prisma.user.findMany({ select: { email: true } });
+            for (const u of users) {
+                await sendEmail({
+                    to: u.email,
+                    subject: `Nuova Regola FantaPiazza: ${title}`,
+                    body: `
+                        <h2 style="color: #bc9c5d;">Nuova Regola Aggiunta!</h2>
+                        <p>È stata aggiunta una nuova regola al regolamento di FantaPiazza:</p>
+                        <p><strong>${title}</strong> (${points}pt)</p>
+                        <p>${description}</p>
+                        <hr/>
+                        <p>In bocca al lupo per la tua squadra!</p>
+                    `
+                });
+            }
+        } catch (err) {
+            console.error("NOTIFY_USERS_ERROR", err);
+        }
 
         return NextResponse.json(newRule);
     } catch (error) {

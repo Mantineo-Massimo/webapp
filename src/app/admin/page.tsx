@@ -4,7 +4,21 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiUsers, FiStar, FiSettings, FiActivity, FiClock, FiPlus, FiTrash2, FiUpload, FiCheck, FiX, FiList, FiEdit2 } from "react-icons/fi";
+import {
+    FiUsers, FiBookOpen,
+    FiShield,
+    FiClock,
+    FiSettings,
+    FiActivity,
+    FiEdit2,
+    FiTrash2,
+    FiStar,
+    FiUpload,
+    FiList,
+    FiPlus,
+    FiCheck,
+    FiX
+} from "react-icons/fi";
 
 type Artist = {
     id: string;
@@ -14,7 +28,7 @@ type Artist = {
     totalScore: number;
 };
 
-type Tab = "dashboard" | "artists" | "points" | "regole" | "history" | "settings";
+type Tab = "dashboard" | "artists" | "points" | "history" | "settings" | "regole" | "users" | "teams";
 
 type RuleDefinition = {
     id: string;
@@ -63,6 +77,12 @@ export default function AdminDashboard() {
     const [rulePoints, setRulePoints] = useState<number | "">("");
     const [rulesLoading, setRulesLoading] = useState(false);
     const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
+
+    // User and Team Management State
+    const [users, setUsers] = useState<any[]>([]);
+    const [usersLoading, setUsersLoading] = useState(false);
+    const [teams, setTeams] = useState<any[]>([]);
+    const [teamsLoading, setTeamsLoading] = useState(false);
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -120,14 +140,47 @@ export default function AdminDashboard() {
             .finally(() => setRulesLoading(false));
     };
 
+    const loadTeams = () => {
+        setTeamsLoading(true);
+        fetch("/api/admin/teams")
+            .then(res => res.json())
+            .then(data => setTeams(data))
+            .catch(err => console.error(err))
+            .finally(() => setTeamsLoading(false));
+    };
+
+    const loadUsers = () => {
+        setUsersLoading(true);
+        fetch("/api/admin/users")
+            .then(res => res.json())
+            .then(data => setUsers(data))
+            .catch(err => console.error(err))
+            .finally(() => setUsersLoading(false));
+    };
+
     useEffect(() => {
         if (session?.user?.role === "ADMIN") {
             loadArtists();
             loadSettings();
-            loadEvents();
-            loadRules();
+            // Initial load for active tab if it's not dashboard
+            if (activeTab === "history") loadEvents();
+            if (activeTab === "regole") loadRules();
+            if (activeTab === "users") loadUsers();
+            if (activeTab === "teams") loadTeams();
+            // For dashboard, events and rules are loaded anyway
+            if (activeTab === "dashboard") {
+                loadEvents();
+                loadRules();
+            }
         }
     }, [session]);
+
+    useEffect(() => {
+        if (activeTab === "history") loadEvents();
+        if (activeTab === "regole") loadRules();
+        if (activeTab === "users") loadUsers();
+        if (activeTab === "teams") loadTeams();
+    }, [activeTab]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -383,7 +436,9 @@ export default function AdminDashboard() {
     const tabs = [
         { id: "dashboard", label: "Dashboard", icon: <FiActivity /> },
         { id: "artists", label: "Artisti", icon: <FiUsers /> },
-        { id: "regole", label: "Regole", icon: <FiList /> },
+        { id: "regole", label: "Regolamento", icon: <FiBookOpen /> },
+        { id: "users", label: "Utenti", icon: <FiUsers /> },
+        { id: "teams", label: "Squadre", icon: <FiShield /> },
         { id: "points", label: "Punti", icon: <FiStar /> },
         { id: "history", label: "Storico", icon: <FiClock /> },
         { id: "settings", label: "Impostazioni", icon: <FiSettings /> },
@@ -844,6 +899,105 @@ export default function AdminDashboard() {
                                             )}
                                         </tbody>
                                     </table>
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+
+                    {/* USERS TAB */}
+                    {activeTab === "users" && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
+                            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                                <FiUsers className="text-oro" /> Gestione Utenti
+                            </h2>
+                            {usersLoading ? (
+                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento utenti...</div>
+                            ) : (
+                                <div className="overflow-x-auto no-scrollbar">
+                                    <table className="w-full text-left">
+                                        <thead className="text-gray-500 text-xs font-black tracking-widest uppercase border-b border-gray-800">
+                                            <tr>
+                                                <th className="pb-4 px-4">Nome</th>
+                                                <th className="pb-4 px-4">Email</th>
+                                                <th className="pb-4 px-4">Ruolo</th>
+                                                <th className="pb-4 px-4">Squadra</th>
+                                                <th className="pb-4 px-4">Data Iscrizione</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-800">
+                                            {users.map(u => (
+                                                <tr key={u.id} className="hover:bg-white/5 transition-colors group">
+                                                    <td className="py-4 px-4 font-bold text-gray-200">{u.name || "N/A"}</td>
+                                                    <td className="py-4 px-4 text-gray-400">{u.email}</td>
+                                                    <td className="py-4 px-4">
+                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${u.role === 'ADMIN' ? 'bg-oro/20 text-oro border border-oro/30' : 'bg-gray-800 text-gray-400'}`}>
+                                                            {u.role}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 px-4 text-sm font-medium text-gray-300">
+                                                        {u.team ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-oro">★</span> {u.team.name}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-gray-600 italic">Nessuna</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-4 px-4 text-xs text-gray-500">
+                                                        {new Date(u.createdAt).toLocaleDateString('it-IT')}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {users.length === 0 && (
+                                                <tr><td colSpan={5} className="py-20 text-center text-gray-600 italic">Nessun utente registrato.</td></tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+
+                    {/* TEAMS TAB */}
+                    {activeTab === "teams" && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
+                            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                                <FiShield className="text-oro" /> Gestione Squadre
+                            </h2>
+                            {teamsLoading ? (
+                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento squadre...</div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {teams.map(t => (
+                                        <div key={t.id} className="bg-[#0a0f1c] p-6 rounded-2xl border border-gray-800 group hover:border-oro/30 transition-all">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h3 className="font-black text-lg text-white group-hover:text-oro transition-colors capitalize">{t.name}</h3>
+                                                    <p className="text-xs text-gray-400 font-medium">Proprietario: {t.user?.name || t.user?.email}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-2xl font-black text-oro">{t.leagues?.[0]?.score || 0}</div>
+                                                    <div className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Punti</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2 mt-6 border-t border-gray-800/50 pt-4">
+                                                <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">Artisti in squadra</div>
+                                                {t.artists?.map((a: any) => (
+                                                    <div key={a.id} className="flex justify-between items-center text-xs">
+                                                        <span className="text-gray-300 font-medium">{a.name}</span>
+                                                        <span className="text-gray-500 font-mono italic">{a.totalScore} pt</span>
+                                                    </div>
+                                                ))}
+                                                {(!t.artists || t.artists.length === 0) && (
+                                                    <p className="text-xs text-gray-600 italic">Squadra ancora incompleta</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {teams.length === 0 && (
+                                        <div className="col-span-full py-20 text-center text-gray-600 italic">Nessuna squadra creata.</div>
+                                    )}
                                 </div>
                             )}
                         </motion.div>
