@@ -775,7 +775,7 @@ export default function AdminDashboard() {
                                     <table className="w-full text-left">
                                         <thead className="text-gray-500 text-xs font-black tracking-widest uppercase border-b border-gray-800">
                                             <tr>
-                                                <th className="pb-4 px-4">ID Azione</th>
+                                                <th className="pb-4 px-4">Account</th>
                                                 <th className="pb-4 px-4">Artista</th>
                                                 <th className="pb-4 px-4">Punti</th>
                                                 <th className="pb-4 px-4">Motivazione</th>
@@ -786,8 +786,11 @@ export default function AdminDashboard() {
                                         <tbody className="divide-y divide-gray-800">
                                             {events.map(event => (
                                                 <tr key={event.id} className="hover:bg-white/5 transition-colors group">
-                                                    <td className="py-4 px-4 text-gray-500 font-mono text-[10px] uppercase">
-                                                        #{event.id.slice(0, 8)}...
+                                                    <td className="py-4 px-4">
+                                                        <div className="text-xs font-bold text-gray-300">
+                                                            {event.createdBy?.name || event.createdBy?.email?.split('@')[0] || "Sistema"}
+                                                        </div>
+                                                        <div className="text-[10px] text-gray-600 font-mono">#{event.id.slice(0, 6)}</div>
                                                     </td>
                                                     <td className="py-4 px-4 font-bold">{event.artist?.name || "Eliminato"}</td>
                                                     <td className="py-4 px-4">

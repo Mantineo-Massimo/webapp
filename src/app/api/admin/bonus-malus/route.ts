@@ -7,7 +7,13 @@ export async function GET() {
     try {
         const events = await prisma.bonusMalusEvent.findMany({
             include: {
-                artist: true
+                artist: true,
+                createdBy: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
+                }
             },
             orderBy: {
                 createdAt: 'desc'
@@ -37,7 +43,12 @@ export async function POST(req: Request) {
 
         const result = await prisma.$transaction(async (tx: any) => {
             const event = await tx.bonusMalusEvent.create({
-                data: { artistId, points: parseInt(points), description }
+                data: {
+                    artistId,
+                    points: parseInt(points),
+                    description,
+                    createdById: user.id
+                }
             });
 
             await tx.artist.update({

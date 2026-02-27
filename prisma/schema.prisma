@@ -18,6 +18,7 @@ model User {
   password  String
   role      Role     @default(USER)
   team      Team?
+  events    BonusMalusEvent[] @relation("AdminEvents")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -71,6 +72,8 @@ model BonusMalusEvent {
   artistId    String
   points      Int
   description String
+  createdBy   User?    @relation("AdminEvents", fields: [createdById], references: [id])
+  createdById String?
   createdAt   DateTime @default(now())
 }
 
