@@ -3,11 +3,19 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+type ArtistEvent = {
+    id: string;
+    points: number;
+    description: string;
+    createdAt: string;
+};
+
 type Artist = {
     id: string;
     name: string;
     totalScore: number;
     image?: string;
+    events?: ArtistEvent[];
 };
 
 type TeamResult = {
@@ -29,6 +37,7 @@ export default function LeaderboardsPage() {
     const [activeTab, setActiveTab] = useState<string>("");
     const [loading, setLoading] = useState(true);
     const [selectedTeam, setSelectedTeam] = useState<TeamResult | null>(null);
+    const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
 
     useEffect(() => {
         fetch("/api/leaderboards")
@@ -142,12 +151,19 @@ export default function LeaderboardsPage() {
                                     <h3 className="text-gray-400 text-sm font-bold uppercase tracking-widest">Gli Armoni della squadra</h3>
                                     <div className="divide-y divide-gray-800/50">
                                         {selectedTeam.team.artists.map((artist) => (
-                                            <div key={artist.id} className="flex justify-between items-center py-4">
+                                            <div
+                                                key={artist.id}
+                                                onClick={() => setSelectedArtist(artist)}
+                                                className="flex justify-between items-center py-4 cursor-pointer hover:bg-white/5 px-2 -mx-2 rounded-xl transition-colors group/artist"
+                                            >
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-[#1e293b] border border-gray-700 flex items-center justify-center text-oro font-bold text-sm">
+                                                    <div className="w-10 h-10 rounded-full bg-[#1e293b] border border-gray-700 flex items-center justify-center text-oro font-bold text-sm group-hover/artist:border-oro transition-colors">
                                                         {artist.name.charAt(0)}
                                                     </div>
-                                                    <span className="font-bold text-lg">{artist.name}</span>
+                                                    <div>
+                                                        <span className="font-bold text-lg block">{artist.name}</span>
+                                                        <span className="text-[10px] text-oro/60 uppercase font-black">Clicca per dettagli</span>
+                                                    </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <span className="block font-mono text-xl font-bold text-oro">{artist.totalScore}</span>
@@ -161,6 +177,67 @@ export default function LeaderboardsPage() {
                                 <div className="mt-8 pt-6 border-t border-gray-800 flex justify-between items-center">
                                     <span className="text-gray-400 font-bold">Punteggio Totale</span>
                                     <span className="text-3xl font-black text-oro">{selectedTeam.score} pt</span>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Modal Dettaglio Artista (Eventi) */}
+                <AnimatePresence>
+                    {selectedArtist && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setSelectedArtist(null)}
+                                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                                animate={{ opacity: 1, scale: 1, x: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                                className="relative bg-[#0f172a] w-full max-w-md rounded-3xl border border-oro/30 shadow-[0_0_40px_rgba(255,215,0,0.15)] overflow-hidden p-8 z-10"
+                            >
+                                <div className="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-oro">{selectedArtist.name}</h2>
+                                        <p className="text-gray-400 text-xs uppercase font-bold tracking-widest mt-1">Cronologia Bonus & Malus</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setSelectedArtist(null)}
+                                        className="text-gray-400 hover:text-white transition-colors p-2 bg-white/5 rounded-full"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {selectedArtist.events && selectedArtist.events.length > 0 ? (
+                                        selectedArtist.events.map((event) => (
+                                            <div key={event.id} className="bg-[#1e293b]/50 border border-gray-800 p-4 rounded-2xl flex justify-between items-center gap-4">
+                                                <div className="flex-1">
+                                                    <p className="text-white text-sm leading-relaxed">{event.description}</p>
+                                                    <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold">{new Date(event.createdAt).toLocaleDateString('it-IT')}</p>
+                                                </div>
+                                                <div className={`text-right font-mono font-black text-xl px-3 py-1 rounded-lg ${event.points >= 0 ? "text-green-500 bg-green-500/10" : "text-red-500 bg-red-500/10"}`}>
+                                                    {event.points > 0 ? `+${event.points}` : event.points}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-12 text-gray-500 italic">
+                                            Nessun bonus o malus ancora assegnato a questo artista.
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-gray-800/50 flex justify-between items-center">
+                                    <span className="text-gray-400 font-bold uppercase text-xs tracking-wider">Bilancio Finale</span>
+                                    <span className="text-2xl font-black text-oro">{selectedArtist.totalScore} pt</span>
                                 </div>
                             </motion.div>
                         </div>

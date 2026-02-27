@@ -9,7 +9,11 @@ export async function GET() {
                     include: {
                         team: {
                             include: {
-                                artists: true
+                                artists: {
+                                    include: {
+                                        events: true
+                                    }
+                                }
                             }
                         },
                     },
