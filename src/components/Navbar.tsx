@@ -28,7 +28,7 @@ export default function Navbar() {
         { href: "/leaderboards", label: "Classifiche", icon: FiList },
     ];
 
-    if (session) {
+    if (status === "authenticated" && session) {
         navLinks.push({ href: "/team/create", label: "Mia Squadra", icon: FiPlus });
         navLinks.push({ href: "/account", label: "Account", icon: FiUser });
 

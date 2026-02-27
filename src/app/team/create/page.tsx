@@ -127,7 +127,10 @@ export default function CreateTeamPage() {
                 body: formData
             });
 
-            if (!res.ok) throw new Error("Errore durante l'upload");
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || "Errore durante l'upload");
+            }
             const data = await res.json();
             setTeamImage(data.url);
         } catch (err: any) {

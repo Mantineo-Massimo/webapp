@@ -35,8 +35,12 @@ export async function POST(req: Request) {
         console.log(`File uploaded to ${absolutePath}`);
 
         return NextResponse.json({ url: relativePath });
-    } catch (error) {
-        console.error("UPLOAD_ERROR", error);
-        return new NextResponse("Internal Error", { status: 500 });
+    } catch (error: any) {
+        console.error("UPLOAD_ERROR_DETAILS:", {
+            message: error.message,
+            code: error.code,
+            stack: error.stack
+        });
+        return new NextResponse(`Errore Server: ${error.message}`, { status: 500 });
     }
 }
