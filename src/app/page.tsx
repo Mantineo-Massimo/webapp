@@ -51,33 +51,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Sezioni Morgana e Orum */}
-      <section className="w-full max-w-6xl mt-24 px-6 grid grid-cols-1 md:grid-cols-2 gap-12 pb-24">
 
-        {/* Morgana */}
-        <div className="group relative bg-[#131d36] rounded-3xl p-8 border border-gray-800 hover:border-oro transition-all duration-300 shadow-xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-oro opacity-5 rounded-full blur-3xl group-hover:opacity-20 transition-all"></div>
-          <h3 className="text-3xl font-bold mb-4 text-oro">Associazione Morgana</h3>
-          <p className="text-gray-400 leading-relaxed mb-6">
-            L&apos;incanto della fiaba e la forza della narrazione. Morgana accoglie l&apos;arte sotto forma
-            di mistero, magia e teatro. In questa lega, i bardi e i poeti trovano il loro palcoscenico naturale.
-          </p>
-          <div className="h-1 w-16 bg-oro rounded-full"></div>
-        </div>
-
-        {/* Orum */}
-        <div className="group relative bg-[#131d36] rounded-3xl p-8 border border-gray-800 hover:border-ocra transition-all duration-300 shadow-xl overflow-hidden">
-          <div className="absolute top-0 left-0 w-32 h-32 bg-ocra opacity-5 rounded-full blur-3xl group-hover:opacity-20 transition-all"></div>
-          <h3 className="text-3xl font-bold mb-4 text-ocra">O.R.U.M.</h3>
-          <p className="text-gray-400 leading-relaxed mb-6">
-            La concretezza dell&apos;azione, la piazza che respira musica, artigianato e strada.
-            Orum è l&apos;urlo della città che si fa arte, un collettore di energie vibranti
-            e incontrollabili.
-          </p>
-          <div className="h-1 w-16 bg-ocra rounded-full"></div>
-        </div>
-
-      </section>
 
     </main>
   );
