@@ -322,9 +322,9 @@ export default function AdminDashboard() {
         if (session?.user?.role === "ADMIN") {
             loadArtists();
             loadSettings();
-            // Initial load for active tab if it's not dashboard
-            if (activeTab === "history") loadEvents();
-            if (activeTab === "regole") loadRules();
+            // Initial load for active tab
+            if (activeTab === "dashboard" || activeTab === "history") loadEvents();
+            if (activeTab === "regole" || activeTab === "points") loadRules();
             if (activeTab === "participants") loadUsers();
             if (activeTab === "sponsors") loadSponsors();
             if (activeTab === "news") loadNews();
@@ -332,8 +332,8 @@ export default function AdminDashboard() {
     }, [session]);
 
     useEffect(() => {
-        if (activeTab === "history") loadEvents();
-        if (activeTab === "regole") loadRules();
+        if (activeTab === "dashboard" || activeTab === "history") loadEvents();
+        if (activeTab === "regole" || activeTab === "points") loadRules();
         if (activeTab === "participants") loadUsers();
         if (activeTab === "sponsors") loadSponsors();
         if (activeTab === "news") loadNews();
