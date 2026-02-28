@@ -31,7 +31,11 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 if (!user.emailVerified) {
-                    // For legacy users created before the verification feature, 
+                    if (user.verificationToken) {
+                        throw new Error("Email non verificata. Controlla la tua casella di posta.")
+                    }
+
+                    // For legacy users created before the verification feature (no token), 
                     // we verify them on their first successful login.
                     await prisma.user.update({
                         where: { id: user.id },

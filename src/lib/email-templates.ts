@@ -107,6 +107,8 @@ const emailWrapper = (content: string) => `
 </html>
 `;
 
+const BASE_URL = process.env.NEXTAUTH_URL || "https://fantapiazza.it";
+
 export const welcomeEmail = (email: string) => emailWrapper(`
     <h1 class="h1">Benvenuto in Piazza! 🎠</h1>
     <p class="text">Ciao <strong>${email}</strong>,</p>
@@ -118,7 +120,7 @@ export const welcomeEmail = (email: string) => emailWrapper(`
         <li>Scala la classifica generale</li>
     </ul>
     <div style="text-align: center; margin-top: 40px;">
-        <a href="https://fantapiazza.it/team/create" class="button">Fonda la tua Squadra</a>
+        <a href="${BASE_URL}/team/create" class="button">Fonda la tua Squadra</a>
     </div>
 `);
 
@@ -131,7 +133,7 @@ export const newArtistEmail = (name: string, cost: number) => emailWrapper(`
     </div>
     <p class="text">Controlla subito se questo artista può fare al caso tuo e aggiorna la tua formazione prima della prossima scadenza!</p>
     <div style="text-align: center; margin-top: 40px;">
-        <a href="https://fantapiazza.it/team/create" class="button">Gestisci Squadra</a>
+        <a href="${BASE_URL}/team/create" class="button">Gestisci Squadra</a>
     </div>
 `);
 
@@ -139,10 +141,10 @@ export const verificationEmail = (token: string) => emailWrapper(`
     <h1 class="h1">Verifica la tua Email 📧</h1>
     <p class="text">Grazie per esserti iscritto a <strong>FantaPiazza</strong>! Per completare la registrazione e iniziare a creare la tua squadra, clicca sul pulsante qui sotto:</p>
     <div style="text-align: center; margin-top: 40px;">
-        <a href="https://fantapiazza.it/api/auth/verify?token=${token}" class="button">Verifica Account</a>
+        <a href="${BASE_URL}/api/auth/verify?token=${token}" class="button">Verifica Account</a>
     </div>
     <p class="text" style="margin-top: 40px; font-size: 12px; color: #94a3b8;">
         Se il pulsante non funziona, copia e incolla questo link nel tuo browser:<br>
-        https://fantapiazza.it/api/auth/verify?token=${token}
+        ${BASE_URL}/api/auth/verify?token=${token}
     </p>
 `);
