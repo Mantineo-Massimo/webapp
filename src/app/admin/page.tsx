@@ -28,7 +28,7 @@ type Artist = {
     totalScore: number;
 };
 
-type Tab = "dashboard" | "artists" | "points" | "history" | "settings" | "regole" | "participants";
+type Tab = "dashboard" | "artists" | "points" | "history" | "settings" | "regole" | "participants" | "sponsors";
 
 type RuleDefinition = {
     id: string;
@@ -83,6 +83,8 @@ export default function AdminDashboard() {
     const [usersLoading, setUsersLoading] = useState(false);
     const [teams, setTeams] = useState<any[]>([]);
     const [teamsLoading, setTeamsLoading] = useState(false);
+    const [sponsors, setSponsors] = useState<any[]>([]);
+    const [sponsorsLoading, setSponsorsLoading] = useState(false);
 
     // User Edit State
     const [editingUser, setEditingUser] = useState<any>(null);
@@ -205,6 +207,52 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleAddSponsor = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newName || !newImage) return;
+        setSponsorsLoading(true);
+        try {
+            const res = await fetch("/api/admin/sponsors", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newName, logoUrl: newImage })
+            });
+            if (!res.ok) throw new Error("Errore salvataggio sponsor");
+            setSuccess("Sponsor aggiunto!");
+            setNewName("");
+            setNewImage(null);
+            loadSponsors();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setSponsorsLoading(false);
+        }
+    };
+
+    const handleDeleteSponsor = async (id: string) => {
+        if (!confirm("Vuoi davvero eliminare questo sponsor?")) return;
+        setSponsorsLoading(true);
+        try {
+            const res = await fetch(`/api/admin/sponsors?id=${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Errore eliminazione sponsor");
+            setSuccess("Sponsor eliminato");
+            loadSponsors();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setSponsorsLoading(false);
+        }
+    };
+
+    const loadSponsors = () => {
+        setSponsorsLoading(true);
+        fetch("/api/admin/sponsors")
+            .then(res => res.json())
+            .then(data => setSponsors(data))
+            .catch(err => console.error(err))
+            .finally(() => setSponsorsLoading(false));
+    };
+
     useEffect(() => {
         if (session?.user?.role === "ADMIN") {
             loadArtists();
@@ -213,6 +261,7 @@ export default function AdminDashboard() {
             if (activeTab === "history") loadEvents();
             if (activeTab === "regole") loadRules();
             if (activeTab === "participants") loadUsers();
+            if (activeTab === "sponsors") loadSponsors();
         }
     }, [session]);
 
@@ -220,6 +269,7 @@ export default function AdminDashboard() {
         if (activeTab === "history") loadEvents();
         if (activeTab === "regole") loadRules();
         if (activeTab === "participants") loadUsers();
+        if (activeTab === "sponsors") loadSponsors();
     }, [activeTab]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -476,11 +526,12 @@ export default function AdminDashboard() {
     const tabs = [
         { id: "dashboard", label: "Dashboard", icon: <FiActivity /> },
         { id: "artists", label: "Artisti", icon: <FiUsers /> },
-        { id: "regole", label: "Regolamento", icon: <FiBookOpen /> },
+        { id: "regole", label: "Regole", icon: <FiBookOpen /> },
         { id: "participants", label: "Partecipanti", icon: <FiUsers /> },
+        { id: "sponsors", label: "Sponsor", icon: <FiStar /> },
         { id: "points", label: "Punti", icon: <FiStar /> },
         { id: "history", label: "Storico", icon: <FiClock /> },
-        { id: "settings", label: "Impostazioni", icon: <FiSettings /> },
+        { id: "settings", label: "Setup", icon: <FiSettings /> },
     ];
 
     return (
@@ -1083,6 +1134,79 @@ export default function AdminDashboard() {
                                     {settingsLoading ? "Salvataggio..." : "Salva Configurazione"}
                                 </button>
                             </form>
+                        </motion.div>
+                    )}
+                    {/* SPONSORS TAB */}
+                    {activeTab === "sponsors" && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+                            <div className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl">
+                                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                                    <FiPlus className="text-oro" /> Aggiungi Nuovo Sponsor
+                                </h2>
+                                <form onSubmit={handleAddSponsor} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Nome Sponsor</label>
+                                        <input
+                                            type="text"
+                                            value={newName}
+                                            onChange={e => setNewName(e.target.value)}
+                                            placeholder="Inserisci nome..."
+                                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro transition-colors"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Logo (Verrà reso grayscale)</label>
+                                        <div className="flex gap-4">
+                                            <label className="flex-1 flex items-center justify-center gap-2 bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-sm font-bold text-gray-400 cursor-pointer hover:bg-white/5 transition-all">
+                                                <FiUpload className={isUploading ? "animate-bounce" : ""} />
+                                                {isUploading ? "Caricamento..." : "Carica Logo"}
+                                                <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
+                                            </label>
+                                            {newImage && (
+                                                <div className="w-12 h-12 rounded-lg border border-gray-800 overflow-hidden bg-white flex items-center justify-center p-1">
+                                                    <img src={newImage} alt="Preview" className="w-full h-full object-contain" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={sponsorsLoading || !newName || !newImage}
+                                        className="bg-oro text-blunotte font-black py-4 rounded-xl hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-oro/20 uppercase tracking-widest text-xs"
+                                    >
+                                        Salva Sponsor
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
+                                <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                                    <FiStar className="text-oro" /> Sponsor Attivi
+                                </h2>
+                                {sponsorsLoading ? (
+                                    <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento sponsor...</div>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                                        {sponsors.map(s => (
+                                            <div key={s.id} className="relative group bg-[#0a0f1c] p-4 rounded-2xl border border-gray-800 hover:border-oro/30 transition-all text-center">
+                                                <button
+                                                    onClick={() => handleDeleteSponsor(s.id)}
+                                                    className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg"
+                                                >
+                                                    <FiTrash2 size={14} />
+                                                </button>
+                                                <div className="aspect-[3/2] bg-white rounded-lg flex items-center justify-center p-3 mb-3">
+                                                    <img src={s.logoUrl} alt={s.name} className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                                </div>
+                                                <div className="text-[10px] font-black uppercase text-gray-500 tracking-wider truncate">{s.name}</div>
+                                            </div>
+                                        ))}
+                                        {sponsors.length === 0 && (
+                                            <div className="col-span-full py-20 text-center text-gray-600 italic">Nessuno sponsor inserito.</div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </motion.div>
                     )}
 

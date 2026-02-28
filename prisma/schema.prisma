@@ -91,6 +91,13 @@ model RuleDefinition {
   events      BonusMalusEvent[]
 }
 
+model Sponsor {
+  id        String   @id @default(uuid())
+  name      String
+  logoUrl   String
+  createdAt DateTime @default(now())
+}
+
 enum Role {
   USER
   ADMIN

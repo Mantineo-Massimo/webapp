@@ -2,8 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import CountdownTimer from "@/components/CountdownTimer";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import SponsorMarquee from "@/components/SponsorMarquee";
 
 export default async function Home() {
+  const session = await getServerSession(authOptions);
   const settings = await prisma.systemSettings.findFirst();
   const deadlineIso = settings?.draftDeadline ? settings.draftDeadline.toISOString() : null;
 
@@ -36,22 +40,44 @@ export default async function Home() {
         )}
 
         <div className="flex flex-col sm:flex-row gap-4 pt-6">
-          <Link
-            href="/auth/register"
-            className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
-          >
-            Inizia l&apos;Avventura
-          </Link>
-          <Link
-            href="/auth/login"
-            className="px-8 py-3 rounded-full bg-viola text-white font-bold text-lg hover:bg-purple-800 transition-all border border-purple-500 shadow-[0_0_15px_rgba(88,28,135,0.4)] transform hover:scale-105"
-          >
-            Accedi
-          </Link>
+          {session ? (
+            <>
+              <Link
+                href="/team"
+                className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
+              >
+                La mia Squadra
+              </Link>
+              <Link
+                href="/classifica"
+                className="px-8 py-3 rounded-full bg-viola text-white font-bold text-lg hover:bg-purple-800 transition-all border border-purple-500 shadow-[0_0_15px_rgba(88,28,135,0.4)] transform hover:scale-105"
+              >
+                Classifica
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/register"
+                className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
+              >
+                Inizia l&apos;Avventura
+              </Link>
+              <Link
+                href="/auth/login"
+                className="px-8 py-3 rounded-full bg-viola text-white font-bold text-lg hover:bg-purple-800 transition-all border border-purple-500 shadow-[0_0_15px_rgba(88,28,135,0.4)] transform hover:scale-105"
+              >
+                Accedi
+              </Link>
+            </>
+          )}
         </div>
       </section>
 
-
+      {/* Sponsor Marquee */}
+      <div className="w-full mt-24">
+        <SponsorMarquee />
+      </div>
 
     </main>
   );
