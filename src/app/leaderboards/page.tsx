@@ -100,21 +100,6 @@ export default function LeaderboardsPage() {
                     </div>
                 </div>
 
-                {/* League Tabs (Only for Teams) */}
-                {viewMode === "teams" && leagues.length > 1 && (
-                    <div className="flex flex-wrap justify-center gap-4 mb-10">
-                        {leagues.map(l => (
-                            <button
-                                key={l.id}
-                                onClick={() => setActiveTab(l.name)}
-                                className={`px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest border transition-all ${activeTab === l.name ? "bg-white/10 border-oro text-oro" : "border-gray-800 text-gray-500 hover:border-gray-600"}`}
-                            >
-                                {l.name}
-                            </button>
-                        ))}
-                    </div>
-                )}
-
                 <p className="text-oro/60 text-xs text-center mb-6 animate-pulse font-bold uppercase tracking-tighter">
                     {viewMode === "teams" ? "💡 Clicca su una squadra per vedere i suoi Armoni" : "💡 Clicca su un artista per vedere i suoi Bonus/Malus"}
                 </p>

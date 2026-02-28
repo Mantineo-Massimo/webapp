@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
     try {
         const leagues = await prisma.league.findMany({
+            where: {
+                name: "Generale"
+            },
             include: {
                 teams: {
                     include: {
