@@ -28,7 +28,7 @@ type Artist = {
     totalScore: number;
 };
 
-type Tab = "dashboard" | "artists" | "points" | "history" | "settings" | "regole" | "users" | "teams";
+type Tab = "dashboard" | "artists" | "points" | "history" | "settings" | "regole" | "participants";
 
 type RuleDefinition = {
     id: string;
@@ -212,21 +212,14 @@ export default function AdminDashboard() {
             // Initial load for active tab if it's not dashboard
             if (activeTab === "history") loadEvents();
             if (activeTab === "regole") loadRules();
-            if (activeTab === "users") loadUsers();
-            if (activeTab === "teams") loadTeams();
-            // For dashboard, events and rules are loaded anyway
-            if (activeTab === "dashboard") {
-                loadEvents();
-                loadRules();
-            }
+            if (activeTab === "participants") loadUsers();
         }
     }, [session]);
 
     useEffect(() => {
         if (activeTab === "history") loadEvents();
         if (activeTab === "regole") loadRules();
-        if (activeTab === "users") loadUsers();
-        if (activeTab === "teams") loadTeams();
+        if (activeTab === "participants") loadUsers();
     }, [activeTab]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -484,8 +477,7 @@ export default function AdminDashboard() {
         { id: "dashboard", label: "Dashboard", icon: <FiActivity /> },
         { id: "artists", label: "Artisti", icon: <FiUsers /> },
         { id: "regole", label: "Regolamento", icon: <FiBookOpen /> },
-        { id: "users", label: "Utenti", icon: <FiUsers /> },
-        { id: "teams", label: "Squadre", icon: <FiShield /> },
+        { id: "participants", label: "Partecipanti", icon: <FiUsers /> },
         { id: "points", label: "Punti", icon: <FiStar /> },
         { id: "history", label: "Storico", icon: <FiClock /> },
         { id: "settings", label: "Impostazioni", icon: <FiSettings /> },
@@ -965,54 +957,73 @@ export default function AdminDashboard() {
                         </motion.div>
                     )}
 
-                    {/* USERS TAB */}
-                    {activeTab === "users" && (
+                    {/* PARTICIPANTS TAB (Unified Users & Teams) */}
+                    {activeTab === "participants" && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
                             <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                                <FiUsers className="text-oro" /> Gestione Utenti
+                                <FiUsers className="text-oro" /> Gestione Partecipanti
                             </h2>
                             {usersLoading ? (
-                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento utenti...</div>
+                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento partecipanti...</div>
                             ) : (
                                 <div className="overflow-x-auto no-scrollbar">
                                     <table className="w-full text-left">
                                         <thead className="text-gray-500 text-xs font-black tracking-widest uppercase border-b border-gray-800">
                                             <tr>
-                                                <th className="pb-4 px-4">Nome</th>
-                                                <th className="pb-4 px-4">Email</th>
-                                                <th className="pb-4 px-4">Ruolo</th>
+                                                <th className="pb-4 px-4">Utente</th>
                                                 <th className="pb-4 px-4">Squadra</th>
-                                                <th className="pb-4 px-4">Data Iscrizione</th>
+                                                <th className="pb-4 px-4 text-center">Punti</th>
+                                                <th className="pb-4 px-4">Artisti</th>
                                                 <th className="pb-4 px-4 text-right">Azioni</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-800">
                                             {users.map(u => (
                                                 <tr key={u.id} className="hover:bg-white/5 transition-colors group">
-                                                    <td className="py-4 px-4 font-bold text-gray-200">{u.name || "N/A"}</td>
-                                                    <td className="py-4 px-4 text-gray-400">{u.email}</td>
                                                     <td className="py-4 px-4">
-                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${u.role === 'ADMIN' ? 'bg-oro/20 text-oro border border-oro/30' : 'bg-gray-800 text-gray-400'}`}>
-                                                            {u.role}
-                                                        </span>
+                                                        <div className="font-bold text-gray-200">{u.name || "N/A"}</div>
+                                                        <div className="text-xs text-gray-500">{u.email}</div>
+                                                        <div className="mt-1">
+                                                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${u.role === 'ADMIN' ? 'bg-oro/20 text-oro border border-oro/30' : 'bg-gray-800 text-gray-500'}`}>
+                                                                {u.role}
+                                                            </span>
+                                                        </div>
                                                     </td>
-                                                    <td className="py-4 px-4 text-sm font-medium text-gray-300">
+                                                    <td className="py-4 px-4">
                                                         {u.team ? (
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-oro">★</span> {u.team.name}
+                                                            <div>
+                                                                <div className="text-sm font-bold text-oro uppercase tracking-tight">{u.team.name}</div>
+                                                                <div className="text-[10px] text-gray-500">Creato il {new Date(u.team.createdAt).toLocaleDateString('it-IT')}</div>
                                                             </div>
                                                         ) : (
-                                                            <span className="text-gray-600 italic">Nessuna</span>
+                                                            <span className="text-gray-600 italic text-sm">Nessuna squadra</span>
                                                         )}
                                                     </td>
-                                                    <td className="py-4 px-4 text-xs text-gray-500">
-                                                        {new Date(u.createdAt).toLocaleDateString('it-IT')}
+                                                    <td className="py-4 px-4 text-center">
+                                                        {u.team ? (
+                                                            <div className="text-xl font-black text-white">{u.team.leagues?.[0]?.score || 0}</div>
+                                                        ) : "-"}
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                                                            {u.team?.artists?.map((a: any) => (
+                                                                <span key={a.id} className="text-[9px] bg-white/5 border border-gray-800 px-1.5 py-0.5 rounded text-gray-400 capitalize" title={a.name}>
+                                                                    {a.name.split(' ')[0]}
+                                                                </span>
+                                                            ))}
+                                                            {u.team && (!u.team.artists || u.team.artists.length === 0) && (
+                                                                <span className="text-[10px] text-gray-600 italic">Incompleta</span>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td className="py-4 px-4 text-right">
                                                         <div className="flex justify-end gap-2">
                                                             <button
                                                                 onClick={() => {
-                                                                    setEditingUser(u);
+                                                                    setEditingUser({
+                                                                        ...u,
+                                                                        teamName: u.team?.name || ""
+                                                                    });
                                                                     setIsUserModalOpen(true);
                                                                 }}
                                                                 className="p-2 text-gray-600 hover:text-oro transition-colors"
@@ -1030,55 +1041,10 @@ export default function AdminDashboard() {
                                                 </tr>
                                             ))}
                                             {users.length === 0 && (
-                                                <tr><td colSpan={5} className="py-20 text-center text-gray-600 italic">Nessun utente registrato.</td></tr>
+                                                <tr><td colSpan={5} className="py-20 text-center text-gray-600 italic">Nessun partecipante registrato.</td></tr>
                                             )}
                                         </tbody>
                                     </table>
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-
-                    {/* TEAMS TAB */}
-                    {activeTab === "teams" && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
-                            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                                <FiShield className="text-oro" /> Gestione Squadre
-                            </h2>
-                            {teamsLoading ? (
-                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento squadre...</div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {teams.map(t => (
-                                        <div key={t.id} className="bg-[#0a0f1c] p-6 rounded-2xl border border-gray-800 group hover:border-oro/30 transition-all">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div>
-                                                    <h3 className="font-black text-lg text-white group-hover:text-oro transition-colors capitalize">{t.name}</h3>
-                                                    <p className="text-xs text-gray-400 font-medium">Proprietario: {t.user?.name || t.user?.email}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-2xl font-black text-oro">{t.leagues?.[0]?.score || 0}</div>
-                                                    <div className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Punti</div>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2 mt-6 border-t border-gray-800/50 pt-4">
-                                                <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">Artisti in squadra</div>
-                                                {t.artists?.map((a: any) => (
-                                                    <div key={a.id} className="flex justify-between items-center text-xs">
-                                                        <span className="text-gray-300 font-medium">{a.name}</span>
-                                                        <span className="text-gray-500 font-mono italic">{a.totalScore} pt</span>
-                                                    </div>
-                                                ))}
-                                                {(!t.artists || t.artists.length === 0) && (
-                                                    <p className="text-xs text-gray-600 italic">Squadra ancora incompleta</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {teams.length === 0 && (
-                                        <div className="col-span-full py-20 text-center text-gray-600 italic">Nessuna squadra creata.</div>
-                                    )}
                                 </div>
                             )}
                         </motion.div>
@@ -1154,6 +1120,17 @@ export default function AdminDashboard() {
                                         <option value="ADMIN">ADMIN</option>
                                     </select>
                                 </div>
+                                {editingUser.team && (
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Nome Squadra</label>
+                                        <input
+                                            type="text"
+                                            value={editingUser.teamName || ""}
+                                            onChange={e => setEditingUser({ ...editingUser, teamName: e.target.value })}
+                                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-oro"
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="flex gap-4 pt-4">
                                     <button

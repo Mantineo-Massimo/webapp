@@ -40,15 +40,28 @@ export async function PUT(req: Request) {
         if (!admin || admin.role !== "ADMIN") return new NextResponse("Forbidden", { status: 403 });
 
         const body = await req.json();
-        const { id, name, role } = body;
+        const { id, name, role, teamName } = body;
 
         if (!id) return new NextResponse("Missing user ID", { status: 400 });
 
+        const updateData: any = {
+            name: name !== undefined ? name : undefined,
+            role: role !== undefined ? role : undefined
+        };
+
+        if (teamName !== undefined) {
+            updateData.team = {
+                update: {
+                    name: teamName
+                }
+            };
+        }
+
         const updatedUser = await prisma.user.update({
             where: { id },
-            data: {
-                name: name !== undefined ? name : undefined,
-                role: role !== undefined ? role : undefined
+            data: updateData,
+            include: {
+                team: true
             }
         });
 
