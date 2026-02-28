@@ -12,6 +12,10 @@ export default function LoginPage() {
     const router = useRouter();
     const [data, setData] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    const { searchParams } = new URL(typeof window !== "undefined" ? window.location.href : "http://localhost");
+    const isVerified = searchParams.get("verified") === "true";
 
     const loginUser = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,7 +27,11 @@ export default function LoginPage() {
         });
 
         if (response?.error) {
-            setError("Credenziali non valide.");
+            if (response.error === "Email non verificata. Controlla la tua casella di posta.") {
+                setError(response.error);
+            } else {
+                setError("Credenziali non valide.");
+            }
         } else {
             router.push("/");
         }
@@ -52,6 +60,12 @@ export default function LoginPage() {
                     <h1 className="text-4xl font-black tracking-tight mb-2">Accedi</h1>
                     <p className="text-gray-400">Bentornato nella Piazza dell&apos;Arte.</p>
                 </div>
+
+                {isVerified && !error && (
+                    <div className="mb-6 p-4 bg-green-900/40 border border-green-500/50 text-green-100 rounded-2xl text-center text-sm font-bold animate-pulse">
+                        ✨ Email verificata! Ora puoi accedere.
+                    </div>
+                )}
 
                 <form onSubmit={loginUser} className="space-y-6 relative z-10">
                     <div>
