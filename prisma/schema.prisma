@@ -34,6 +34,7 @@ model Team {
   id        String       @id @default(uuid())
   name      String       @unique
   userId    String       @unique
+  captainId String?
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
   image     String?

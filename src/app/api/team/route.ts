@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { teamName, artistIds, image } = body;
+        const { teamName, artistIds, image, captainId } = body;
 
         // Validation
         if (!teamName || !artistIds || artistIds.length !== 5) {
@@ -44,6 +44,10 @@ export async function POST(req: Request) {
         const totalCost = artists.reduce((sum: number, artist: { cost: number }) => sum + artist.cost, 0);
         if (totalCost > 100) {
             return new NextResponse("Armoni insufficienti", { status: 400 });
+        }
+
+        if (captainId && !artistIds.includes(captainId)) {
+            return new NextResponse("Il capitano deve essere uno dei membri della squadra", { status: 400 });
         }
 
         const existingTeam = await prisma.team.findUnique({
@@ -74,6 +78,7 @@ export async function POST(req: Request) {
                     name: teamName,
                     image: image || null,
                     userId: user.id,
+                    captainId: captainId || null,
                     artists: {
                         connect: artists.map((a: { id: string }) => ({ id: a.id }))
                     }
@@ -81,7 +86,10 @@ export async function POST(req: Request) {
             });
 
             // 2. Enroll the team in all leagues with current points
-            const initialScore = artists.reduce((sum: number, a: { totalScore: number }) => sum + a.totalScore, 0);
+            const initialScore = artists.reduce((sum: number, a: any) => {
+                const isCaptain = a.id === captainId;
+                return sum + (isCaptain ? a.totalScore * 2 : a.totalScore);
+            }, 0);
 
             const teamLeaguesData = leagues.map((league: { id: string }) => ({
                 teamId: newTeam.id,
@@ -147,7 +155,7 @@ export async function PUT(req: Request) {
         }
 
         const body = await req.json();
-        const { teamName, artistIds, image } = body;
+        const { teamName, artistIds, image, captainId } = body;
 
         if (!teamName || !artistIds || artistIds.length !== 5) {
             return new NextResponse("Invalid request data", { status: 400 });
@@ -172,6 +180,10 @@ export async function PUT(req: Request) {
             return new NextResponse("Armoni insufficienti", { status: 400 });
         }
 
+        if (captainId && !artistIds.includes(captainId)) {
+            return new NextResponse("Il capitano deve essere uno dei membri della squadra", { status: 400 });
+        }
+
         const existingTeam = await prisma.team.findUnique({
             where: { userId: user.id },
             include: { artists: true }
@@ -190,7 +202,10 @@ export async function PUT(req: Request) {
         }
 
         // Update team and its score in leagues
-        const updatedScore = artists.reduce((sum: number, a: { totalScore: number }) => sum + a.totalScore, 0);
+        const updatedScore = artists.reduce((sum: number, a: any) => {
+            const isCaptain = a.id === captainId;
+            return sum + (isCaptain ? a.totalScore * 2 : a.totalScore);
+        }, 0);
 
         const updatedTeam = await prisma.$transaction(async (tx: any) => {
             // 1. Update team artists
@@ -199,6 +214,7 @@ export async function PUT(req: Request) {
                 data: {
                     name: teamName,
                     image: image || null,
+                    captainId: captainId || null,
                     artists: {
                         set: artistIds.map((id: string) => ({ id }))
                     }

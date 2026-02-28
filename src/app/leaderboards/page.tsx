@@ -192,7 +192,12 @@ export default function LeaderboardsPage() {
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <span className="font-bold text-lg block">{artist.name}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-bold text-lg">{artist.name}</span>
+                                                            {(selectedTeam.team as any).captainId === artist.id && (
+                                                                <span className="bg-oro text-blunotte text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter">Capitano</span>
+                                                            )}
+                                                        </div>
                                                         <span className="text-[10px] text-oro/60 uppercase font-black">Clicca per dettagli</span>
                                                     </div>
                                                 </div>

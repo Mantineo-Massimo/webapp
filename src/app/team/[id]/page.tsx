@@ -105,7 +105,12 @@ export default async function TeamProfilePage({ params }: { params: { id: string
                                     <div className="absolute inset-0 border border-white/5 rounded-2xl pointer-events-none"></div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-xl font-bold mb-1 truncate group-hover:text-oro transition-colors">{artist.name}</h3>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <h3 className="text-xl font-bold truncate group-hover:text-oro transition-colors">{artist.name}</h3>
+                                        {team.captainId === artist.id && (
+                                            <span className="bg-oro text-blunotte text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter">Capitano</span>
+                                        )}
+                                    </div>
                                     <div className="flex items-center gap-3">
                                         <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">{artist.cost} Armoni</span>
                                         <span className="w-1 h-1 bg-gray-800 rounded-full"></span>

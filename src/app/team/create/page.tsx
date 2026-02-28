@@ -29,6 +29,7 @@ export default function CreateTeamPage() {
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [teamId, setTeamId] = useState<string | null>(null);
+    const [captainId, setCaptainId] = useState<string | null>(null);
     const [initialFetchDone, setInitialFetchDone] = useState(false);
 
     const [deadline, setDeadline] = useState<string | null>(null);
@@ -54,6 +55,7 @@ export default function CreateTeamPage() {
                 if (data && data.id) {
                     setIsEditing(true);
                     setTeamId(data.id);
+                    setCaptainId(data.captainId || null);
                     setTeamName(data.name);
                     setTeamImage(data.image || null);
                     setSelectedArtists(data.artists || []);
@@ -96,10 +98,9 @@ export default function CreateTeamPage() {
     const toggleArtist = (artist: Artist) => {
         if (isExpired) return;
 
-        const isSelected = selectedArtists.some(a => a.id === artist.id);
-
-        if (isSelected) {
+        if (selectedArtists.some(a => a.id === artist.id)) {
             setSelectedArtists(selectedArtists.filter(a => a.id !== artist.id));
+            if (captainId === artist.id) setCaptainId(null);
         } else {
             if (selectedArtists.length >= 5) {
                 setError("Puoi selezionare massimo 5 artisti.");
@@ -168,7 +169,8 @@ export default function CreateTeamPage() {
                 body: JSON.stringify({
                     teamName: teamName,
                     image: teamImage,
-                    artistIds: selectedArtists.map(a => a.id)
+                    artistIds: selectedArtists.map(a => a.id),
+                    captainId: captainId
                 })
             });
 
@@ -237,10 +239,25 @@ export default function CreateTeamPage() {
                                         <div className="flex flex-col gap-4">
                                             <div className="flex justify-between items-start">
                                                 <h3 className="text-xl font-bold truncate pr-2 z-10">{artist.name}</h3>
-                                                <span className={`px-2 py-1 rounded-lg text-sm font-bold z-10 ${isSelected ? "bg-oro text-blunotte" : "bg-gray-800 text-gray-300"
-                                                    }`}>
-                                                    {artist.cost} Armoni
-                                                </span>
+                                                <div className="flex flex-col items-end gap-1 z-10">
+                                                    <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${isSelected ? "bg-white/20 text-white" : "bg-gray-800 text-gray-400"}`}>
+                                                        {artist.cost} ARMONI
+                                                    </span>
+                                                    {isSelected && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setCaptainId(artist.id);
+                                                            }}
+                                                            className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${captainId === artist.id
+                                                                ? "bg-oro text-blunotte shadow-[0_0_10px_rgba(255,215,0,0.5)]"
+                                                                : "bg-black/40 text-gray-400 hover:bg-black/60 hover:text-white"
+                                                                }`}
+                                                        >
+                                                            {captainId === artist.id ? "★ Capitano" : "Capitano?"}
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {/* Artist Image Preview */}

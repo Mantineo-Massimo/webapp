@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
+import { newArtistEmail } from "@/lib/email-templates";
 
 export async function POST(req: Request) {
     try {
@@ -35,13 +36,7 @@ export async function POST(req: Request) {
                 await sendEmail({
                     to: u.email,
                     subject: `Nuova Artist FantaPiazza: ${name}`,
-                    body: `
-                        <h2 style="color: #bc9c5d;">Un nuovo Artist è arrivato!</h2>
-                        <p>Preparati! <strong>${name}</strong> si è unito alla competizione.</p>
-                        <p>Costo: ${cost} crediti.</p>
-                        <hr/>
-                        <p>Corri a modificare la tua squadra o creane una nuova!</p>
-                    `
+                    body: newArtistEmail(name, parseInt(cost))
                 });
             }
         } catch (err) {
