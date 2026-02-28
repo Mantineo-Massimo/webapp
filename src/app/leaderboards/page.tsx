@@ -37,19 +37,23 @@ type League = {
 
 export default function LeaderboardsPage() {
     const [leagues, setLeagues] = useState<League[]>([]);
+    const [artistsRanking, setArtistsRanking] = useState<Artist[]>([]);
     const [activeTab, setActiveTab] = useState<string>("");
+    const [viewMode, setViewMode] = useState<"teams" | "artists">("teams");
     const [loading, setLoading] = useState(true);
     const [selectedTeam, setSelectedTeam] = useState<TeamResult | null>(null);
     const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
 
     useEffect(() => {
-        fetch("/api/leaderboards")
-            .then(res => res.json())
-            .then((data: League[]) => {
-                setLeagues(data);
-                if (data.length > 0) {
-                    // Default to Generale or first available
-                    const defaultTab = data.find(l => l.name === "Generale")?.name || data[0].name;
+        Promise.all([
+            fetch("/api/leaderboards").then(res => res.json()),
+            fetch("/api/artists/leaderboard").then(res => res.json())
+        ])
+            .then(([leaguesData, artistsData]) => {
+                setLeagues(leaguesData);
+                setArtistsRanking(artistsData);
+                if (leaguesData.length > 0) {
+                    const defaultTab = leaguesData.find((l: any) => l.name === "Generale")?.name || leaguesData[0].name;
                     setActiveTab(defaultTab);
                 }
                 setLoading(false);
@@ -66,7 +70,7 @@ export default function LeaderboardsPage() {
         </main>
     );
 
-    if (!leagues.length) return <div className="min-h-screen bg-blunotte flex items-center justify-center text-white">Nessuna lega disponibile al momento.</div>;
+    if (!leagues.length && !artistsRanking.length) return <div className="min-h-screen bg-blunotte flex items-center justify-center text-white">Nessun dato disponibile al momento.</div>;
 
     const currentLeague = leagues.find(l => l.name === activeTab);
 
@@ -75,64 +79,135 @@ export default function LeaderboardsPage() {
             <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Classifiche della <span className="text-oro">Piazza</span></h1>
-                    <p className="text-gray-400">Scopri chi domina nelle varie leghe di FantaPiazza.</p>
-                    <p className="text-oro/60 text-sm mt-2 animate-pulse font-bold uppercase tracking-tighter">💡 Clicca su una squadra per vedere i suoi Armoni</p>
+                    <p className="text-gray-400">Tieni d'occhio i punteggi di squadre e artisti in tempo reale.</p>
                 </div>
 
+                {/* Tab Switcher (Teams vs Artists) */}
+                <div className="flex justify-center mb-10">
+                    <div className="bg-[#131d36] p-1.5 rounded-2xl border border-gray-800 flex gap-1">
+                        <button
+                            onClick={() => setViewMode("teams")}
+                            className={`px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest transition-all ${viewMode === "teams" ? "bg-oro text-blunotte shadow-lg shadow-oro/20" : "text-gray-500 hover:text-white"}`}
+                        >
+                            Podio Squadre
+                        </button>
+                        <button
+                            onClick={() => setViewMode("artists")}
+                            className={`px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest transition-all ${viewMode === "artists" ? "bg-oro text-blunotte shadow-lg shadow-oro/20" : "text-gray-500 hover:text-white"}`}
+                        >
+                            Top Armoni
+                        </button>
+                    </div>
+                </div>
+
+                {/* League Tabs (Only for Teams) */}
+                {viewMode === "teams" && leagues.length > 1 && (
+                    <div className="flex flex-wrap justify-center gap-4 mb-10">
+                        {leagues.map(l => (
+                            <button
+                                key={l.id}
+                                onClick={() => setActiveTab(l.name)}
+                                className={`px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest border transition-all ${activeTab === l.name ? "bg-white/10 border-oro text-oro" : "border-gray-800 text-gray-500 hover:border-gray-600"}`}
+                            >
+                                {l.name}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                <p className="text-oro/60 text-xs text-center mb-6 animate-pulse font-bold uppercase tracking-tighter">
+                    {viewMode === "teams" ? "💡 Clicca su una squadra per vedere i suoi Armoni" : "💡 Clicca su un artista per vedere i suoi Bonus/Malus"}
+                </p>
 
                 {/* Tabella Classifica */}
                 <div className="bg-[#131d36] rounded-3xl border border-gray-800 shadow-2xl overflow-hidden relative">
-
                     <table className="w-full text-left">
                         <thead className="bg-[#0a0f1c] text-gray-400 border-b border-gray-800">
                             <tr>
-                                <th className="px-6 py-4 font-bold">Posizione</th>
-                                <th className="px-6 py-4 font-bold">Squadra</th>
-                                <th className="px-6 py-4 font-bold text-right">Punteggio</th>
+                                <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest">Rank</th>
+                                <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest">{viewMode === "teams" ? "Squadra" : "Artista"}</th>
+                                <th className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-right">Punti</th>
                             </tr>
                         </thead>
                         <tbody>
                             <AnimatePresence mode="wait">
-                                {currentLeague?.teams.map((t, index) => (
-                                    <motion.tr
-                                        key={`${currentLeague.id}-${t.team.name}`}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.05 }}
-                                        onClick={() => setSelectedTeam(t)}
-                                        className="border-b border-gray-800/50 hover:bg-[#1f2937] transition-colors cursor-pointer group"
-                                    >
-                                        <td className="px-6 py-4">
-                                            {index === 0 ? <span className="text-2xl">🥇</span> :
-                                                index === 1 ? <span className="text-2xl">🥈</span> :
-                                                    index === 2 ? <span className="text-2xl">🥉</span> :
-                                                        <span className="font-mono text-gray-400 ml-2">{index + 1}</span>}
-                                        </td>
-                                        <td className="px-6 py-4 flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-[#0a0f1c] border border-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                                                {t.team.image ? (
-                                                    <img src={t.team.image} alt={t.team.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <img src="/fanta-logo.png" alt="Default" className="w-full h-full object-contain p-1.5 opacity-40 shrink-0" />
-                                                )}
-                                            </div>
-                                            <span className="font-bold text-lg">{t.team.name}</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-mono text-xl font-bold text-oro">{t.score} pt</td>
-                                    </motion.tr>
-                                ))}
+                                {viewMode === "teams" ? (
+                                    currentLeague?.teams.map((t, index) => (
+                                        <motion.tr
+                                            key={`${currentLeague.id}-${t.team.name}`}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            onClick={() => setSelectedTeam(t)}
+                                            className="border-b border-gray-800/50 hover:bg-[#1f2937] transition-colors cursor-pointer group"
+                                        >
+                                            <td className="px-6 py-4">
+                                                {index === 0 ? <span className="text-2xl">🥇</span> :
+                                                    index === 1 ? <span className="text-2xl">🥈</span> :
+                                                        index === 2 ? <span className="text-2xl">🥉</span> :
+                                                            <span className="font-mono text-gray-400 ml-2">{index + 1}</span>}
+                                            </td>
+                                            <td className="px-6 py-4 flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-xl bg-[#0a0f1c] border border-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                                    {t.team.image ? (
+                                                        <img src={t.team.image} alt={t.team.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <img src="/fanta-logo.png" alt="Default" className="w-full h-full object-contain p-1.5 opacity-40 shrink-0" />
+                                                    )}
+                                                </div>
+                                                <span className="font-bold text-lg">{t.team.name}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right font-mono text-xl font-bold text-oro">{t.score} pt</td>
+                                        </motion.tr>
+                                    ))
+                                ) : (
+                                    artistsRanking.map((artist, index) => (
+                                        <motion.tr
+                                            key={artist.id}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            onClick={() => setSelectedArtist(artist)}
+                                            className="border-b border-gray-800/50 hover:bg-[#1f2937] transition-colors cursor-pointer group"
+                                        >
+                                            <td className="px-6 py-4">
+                                                {index === 0 ? <span className="text-2xl">🥇</span> :
+                                                    index === 1 ? <span className="text-2xl">🥈</span> :
+                                                        index === 2 ? <span className="text-2xl">🥉</span> :
+                                                            <span className="font-mono text-gray-400 ml-2">{index + 1}</span>}
+                                            </td>
+                                            <td className="px-6 py-4 flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-xl bg-[#0a0f1c] border border-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                                    {artist.image ? (
+                                                        <img src={artist.image} alt={artist.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-oro font-black">{artist.name.charAt(0)}</span>
+                                                    )}
+                                                </div>
+                                                <span className="font-bold text-lg">{artist.name}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right font-mono text-xl font-bold text-oro">{artist.totalScore} pt</td>
+                                        </motion.tr>
+                                    ))
+                                )}
                             </AnimatePresence>
 
-                            {(!currentLeague?.teams || currentLeague.teams.length === 0) && (
+                            {viewMode === "teams" && (!currentLeague?.teams || currentLeague.teams.length === 0) && (
                                 <tr>
                                     <td colSpan={3} className="px-6 py-12 text-center text-gray-500 italic">
                                         Nessuna squadra ancora iscritta in questa lega.
                                     </td>
                                 </tr>
                             )}
+                            {viewMode === "artists" && artistsRanking.length === 0 && (
+                                <tr>
+                                    <td colSpan={3} className="px-6 py-12 text-center text-gray-500 italic">
+                                        Nessun artista trovato.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
-
                 </div>
 
                 {/* Modal Dettaglio Squadra */}
