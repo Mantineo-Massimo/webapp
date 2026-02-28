@@ -55,6 +55,7 @@ export default function AdminDashboard() {
     const [newImage, setNewImage] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [artistLoading, setArtistLoading] = useState(false);
+    const [editingArtistId, setEditingArtistId] = useState<string | null>(null);
 
     // Points State
     const [selectedArtistId, setSelectedArtistId] = useState("");
@@ -378,18 +379,25 @@ export default function AdminDashboard() {
         setSuccess("");
 
         try {
+            const method = editingArtistId ? "PUT" : "POST";
             const res = await fetch("/api/admin/artists", {
-                method: "POST",
+                method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: newName, cost: newCost, image: newImage })
+                body: JSON.stringify({
+                    id: editingArtistId,
+                    name: newName,
+                    cost: newCost,
+                    image: newImage
+                })
             });
 
-            if (!res.ok) throw new Error("Errore durante l'aggiunta dell'artista");
+            if (!res.ok) throw new Error(`Errore durante ${editingArtistId ? 'la modifica' : "l'aggiunta"} dell'artista`);
 
-            setSuccess(`Artista ${newName} aggiunto con successo.`);
+            setSuccess(`Artista ${newName} ${editingArtistId ? 'modificato' : 'aggiunto'} con successo.`);
             setNewName("");
             setNewCost("");
             setNewImage(null);
+            setEditingArtistId(null);
             loadArtists();
             setTimeout(() => setSuccess(""), 4000);
         } catch (err: any) {
@@ -397,6 +405,22 @@ export default function AdminDashboard() {
         } finally {
             setArtistLoading(false);
         }
+    };
+
+    const startEditingArtist = (artist: Artist) => {
+        setEditingArtistId(artist.id);
+        setNewName(artist.name);
+        setNewCost(artist.cost);
+        setNewImage(artist.image || null);
+        // Scroll to form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelEditingArtist = () => {
+        setEditingArtistId(null);
+        setNewName("");
+        setNewCost("");
+        setNewImage(null);
     };
 
     const handleDeleteArtist = async (id: string, name: string) => {
@@ -694,8 +718,19 @@ export default function AdminDashboard() {
                     {activeTab === "artists" && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
                             <div className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl">
-                                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                                    <FiPlus className="text-oro" /> Aggiungi Nuovo Artista
+                                <h2 className="text-2xl font-bold mb-6 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        {editingArtistId ? <FiEdit2 className="text-oro" /> : <FiPlus className="text-oro" />}
+                                        {editingArtistId ? "Modifica Artista" : "Aggiungi Nuovo Artista"}
+                                    </div>
+                                    {editingArtistId && (
+                                        <button
+                                            onClick={cancelEditingArtist}
+                                            className="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
+                                        >
+                                            Annulla
+                                        </button>
+                                    )}
                                 </h2>
                                 <form onSubmit={handleAddArtist} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                                     <div className="md:col-span-2 space-y-2">
@@ -783,12 +818,22 @@ export default function AdminDashboard() {
                                                     <td className="py-4 px-4 text-center font-mono text-oro font-bold">{a.cost}</td>
                                                     <td className="py-4 px-4 text-center font-mono font-bold">{a.totalScore}</td>
                                                     <td className="py-4 px-4 text-right">
-                                                        <button
-                                                            onClick={() => handleDeleteArtist(a.id, a.name)}
-                                                            className="p-2 text-gray-600 hover:text-red-500 transition-colors"
-                                                        >
-                                                            <FiTrash2 size={20} />
-                                                        </button>
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                onClick={() => startEditingArtist(a)}
+                                                                className="p-2 text-gray-600 hover:text-oro transition-colors"
+                                                                title="Modifica"
+                                                            >
+                                                                <FiEdit2 size={20} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteArtist(a.id, a.name)}
+                                                                className="p-2 text-gray-600 hover:text-red-500 transition-colors"
+                                                                title="Elimina"
+                                                            >
+                                                                <FiTrash2 size={20} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

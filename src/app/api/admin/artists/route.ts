@@ -50,6 +50,37 @@ export async function POST(req: Request) {
     }
 }
 
+export async function PUT(req: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.email) return new NextResponse("Unauthorized", { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+        if (!user || user.role !== "ADMIN") return new NextResponse("Forbidden", { status: 403 });
+
+        const body = await req.json();
+        const { id, name, cost, image } = body;
+
+        if (!id || !name || cost === undefined) {
+            return new NextResponse("Missing id, name or cost", { status: 400 });
+        }
+
+        const updatedArtist = await prisma.artist.update({
+            where: { id },
+            data: {
+                name,
+                cost: parseInt(cost),
+                image: image || null
+            }
+        });
+
+        return NextResponse.json(updatedArtist);
+    } catch (error) {
+        console.error("ADMIN_UPDATE_ARTIST_ERROR", error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
+}
+
 export async function DELETE(req: Request) {
     try {
         const session = await getServerSession(authOptions);
