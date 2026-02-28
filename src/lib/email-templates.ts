@@ -6,6 +6,8 @@
 const APP_COLOR_GOLD = "#bc9c5d";
 const APP_COLOR_DARK_BLUE = "#0a0f1c";
 
+const BASE_URL = process.env.NEXTAUTH_URL || "https://fantapiazza.it";
+
 /**
  * Modern HTML wrapper for all FantaPiazza emails.
  */
@@ -90,8 +92,8 @@ const emailWrapper = (content: string) => `
 <body>
     <div class="container">
         <div class="header">
-            <!-- In a real production environment, use absolute URL to public asset -->
-            <img src="https://fantapiazza.it/fanta-logo.png" alt="FantaPiazza" class="logo">
+            <!-- Logo uses dynamic BASE_URL to ensure visibility in all environments -->
+            <img src="${BASE_URL}/fanta-logo.png" alt="FantaPiazza" class="logo">
         </div>
         <div class="content">
             ${content}
@@ -107,7 +109,6 @@ const emailWrapper = (content: string) => `
 </html>
 `;
 
-const BASE_URL = process.env.NEXTAUTH_URL || "https://fantapiazza.it";
 
 export const welcomeEmail = (email: string) => emailWrapper(`
     <h1 class="h1">Benvenuto in Piazza! 🎠</h1>
