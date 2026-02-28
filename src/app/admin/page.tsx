@@ -495,31 +495,41 @@ export default function AdminDashboard() {
         <main className="min-h-screen text-white pb-32">
             <div className="max-w-6xl mx-auto px-6 pt-56 md:pt-44">
 
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                    <div>
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2">Pannello <span className="text-red-500">Admin</span></h1>
-                        <p className="text-gray-400">Piazza dell&apos;Arte & Associazioni Morgana/Orum</p>
+                {/* Header Section */}
+                <div className="space-y-8 mb-12">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div>
+                            <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4">
+                                Pannello <span className="text-oro drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">Admin</span>
+                            </h1>
+                            <p className="text-gray-400 text-lg flex items-center gap-2">
+                                <span className="w-8 h-[1px] bg-oro/30"></span>
+                                Piazza dell&apos;Arte & Associazioni Morgana/Orum
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Tabs Navigation */}
-                    <div className="flex bg-[#0a0f1c]/80 backdrop-blur-xl p-1 rounded-2xl border border-gray-800/50 shadow-2xl overflow-x-auto no-scrollbar">
-                        <div className="flex gap-1">
-                            {tabs.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as Tab)}
-                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all whitespace-nowrap font-bold text-xs uppercase tracking-widest ${activeTab === tab.id
-                                        ? "bg-red-600 text-white shadow-lg shadow-red-600/30"
-                                        : "text-gray-500 hover:text-gray-200 hover:bg-white/5"
-                                        }`}
-                                >
-                                    <span className={activeTab === tab.id ? "text-white" : "text-gray-400"}>
-                                        {tab.icon}
-                                    </span>
-                                    {tab.label}
-                                </button>
-                            ))}
+                    {/* Navigation Tabs - Dedicated Row */}
+                    <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-oro/10 via-transparent to-oro/10 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                        <div className="relative flex bg-[#131d36]/80 backdrop-blur-xl p-2 rounded-2xl border border-gray-800/50 overflow-x-auto no-scrollbar shadow-2xl">
+                            <div className="flex gap-2 min-w-max px-1">
+                                {tabs.map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id as Tab)}
+                                        className={`flex items-center gap-3 px-6 py-3 rounded-xl transition-all duration-300 whitespace-nowrap font-black text-xs uppercase tracking-widest ${activeTab === tab.id
+                                            ? "bg-gradient-to-r from-oro to-ocra text-blunotte shadow-[0_0_20px_rgba(255,215,0,0.3)] scale-105 active:scale-100"
+                                            : "text-gray-400 hover:text-white hover:bg-white/5"
+                                            }`}
+                                    >
+                                        <span className={activeTab === tab.id ? "text-blunotte" : "text-oro/70"}>
+                                            {tab.icon}
+                                        </span>
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
