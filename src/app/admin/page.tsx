@@ -504,21 +504,29 @@ export default function AdminDashboard() {
                     {/* Navigation Tabs - Dedicated Row */}
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-r from-oro/10 via-transparent to-oro/10 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-                        <div className="relative flex bg-[#131d36]/80 backdrop-blur-xl p-2 rounded-2xl border border-gray-800/50 overflow-x-auto no-scrollbar shadow-2xl">
-                            <div className="flex gap-2 min-w-max px-1">
+                        <div className="relative bg-[#131d36]/80 backdrop-blur-xl p-1.5 rounded-2xl border border-gray-800/50 shadow-2xl overflow-hidden">
+                            <div className="flex w-full">
                                 {tabs.map((tab) => (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id as Tab)}
-                                        className={`flex items-center gap-3 px-6 py-3 rounded-xl transition-all duration-300 whitespace-nowrap font-black text-xs uppercase tracking-widest ${activeTab === tab.id
-                                            ? "bg-gradient-to-r from-oro to-ocra text-blunotte shadow-[0_0_20px_rgba(255,215,0,0.3)] scale-105 active:scale-100"
+                                        className={`flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-1 md:px-3 py-2.5 rounded-xl transition-all duration-300 whitespace-nowrap font-black text-[9px] md:text-[10px] uppercase tracking-wider ${activeTab === tab.id
+                                            ? "bg-gradient-to-r from-oro to-ocra text-blunotte shadow-[0_0_15px_rgba(255,215,0,0.3)] scale-[1.02] z-10"
                                             : "text-gray-400 hover:text-white hover:bg-white/5"
                                             }`}
                                     >
-                                        <span className={activeTab === tab.id ? "text-blunotte" : "text-oro/70"}>
+                                        <span className={`text-base md:text-sm ${activeTab === tab.id ? "text-blunotte" : "text-oro/70"}`}>
                                             {tab.icon}
                                         </span>
-                                        {tab.label}
+                                        <span className="hidden sm:inline-block md:inline-block">
+                                            {tab.label}
+                                        </span>
+                                        {/* Short label for extra small mobile if needed, but let's try fitting full text first */}
+                                        <span className="sm:hidden text-[8px]">
+                                            {tab.label === "Regolamento" ? "Regole" :
+                                                tab.label === "Partecipanti" ? "Utenti" :
+                                                    tab.label === "Impostazioni" ? "Setup" : tab.label}
+                                        </span>
                                     </button>
                                 ))}
                             </div>
