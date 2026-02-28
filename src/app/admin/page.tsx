@@ -109,9 +109,19 @@ export default function AdminDashboard() {
 
     const loadArtists = () => {
         fetch("/api/artists")
-            .then(res => res.json())
+            .then(async res => {
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                const contentType = res.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("Il server ha risposto con un formato non valido (HTML/Text). Invia una segnalazione tecnica.");
+                }
+                return res.json();
+            })
             .then(data => setArtists(data))
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error("LOAD_ARTISTS_ERROR", err);
+                setError("Errore caricamento artisti: " + err.message);
+            });
     };
 
     const loadSettings = () => {
@@ -133,8 +143,12 @@ export default function AdminDashboard() {
         fetch("/api/admin/bonus-malus")
             .then(async res => {
                 if (!res.ok) {
-                    const errorText = await res.text();
+                    const errorText = await res.text().catch(() => "Unknown error");
                     throw new Error(`API Error ${res.status}: ${errorText}`);
+                }
+                const contentType = res.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("Risposta del server non valida. Potrebbe esserci un errore di sistema.");
                 }
                 return res.json();
             })

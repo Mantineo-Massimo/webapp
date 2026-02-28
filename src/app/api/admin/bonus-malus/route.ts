@@ -61,26 +61,27 @@ export async function POST(req: Request) {
 
             const teamsWithArtist = await tx.team.findMany({
                 where: { artists: { some: { id: artistId } } },
-                select: { id: true }
+                select: { id: true, captainId: true }
             });
 
-            const teamIds = teamsWithArtist.map((t: { id: string }) => t.id);
-            if (teamIds.length > 0) {
-                // Update normal teams
+            const normalTeamIds = teamsWithArtist
+                .filter((t: any) => t.captainId !== artistId)
+                .map((t: any) => t.id);
+
+            const captainTeamIds = teamsWithArtist
+                .filter((t: any) => t.captainId === artistId)
+                .map((t: any) => t.id);
+
+            if (normalTeamIds.length > 0) {
                 await tx.teamLeague.updateMany({
-                    where: {
-                        teamId: { in: teamIds },
-                        team: { captainId: { not: artistId } }
-                    },
+                    where: { teamId: { in: normalTeamIds } },
                     data: { score: { increment: parseInt(points) } }
                 });
+            }
 
-                // Update teams where artist IS captain (DOUBLE POINTS)
+            if (captainTeamIds.length > 0) {
                 await tx.teamLeague.updateMany({
-                    where: {
-                        teamId: { in: teamIds },
-                        team: { captainId: artistId }
-                    },
+                    where: { teamId: { in: captainTeamIds } },
                     data: { score: { increment: parseInt(points) * 2 } }
                 });
             }
@@ -125,26 +126,27 @@ export async function DELETE(req: Request) {
             // 3. Subtract points from teams
             const teamsWithArtist = await tx.team.findMany({
                 where: { artists: { some: { id: artistId } } },
-                select: { id: true }
+                select: { id: true, captainId: true }
             });
 
-            const teamIds = teamsWithArtist.map((t: { id: string }) => t.id);
-            if (teamIds.length > 0) {
-                // Revert normal teams
+            const normalTeamIds = teamsWithArtist
+                .filter((t: any) => t.captainId !== artistId)
+                .map((t: any) => t.id);
+
+            const captainTeamIds = teamsWithArtist
+                .filter((t: any) => t.captainId === artistId)
+                .map((t: any) => t.id);
+
+            if (normalTeamIds.length > 0) {
                 await tx.teamLeague.updateMany({
-                    where: {
-                        teamId: { in: teamIds },
-                        team: { captainId: { not: artistId } }
-                    },
+                    where: { teamId: { in: normalTeamIds } },
                     data: { score: { decrement: points } }
                 });
+            }
 
-                // Revert teams where artist IS captain (DOUBLE POINTS)
+            if (captainTeamIds.length > 0) {
                 await tx.teamLeague.updateMany({
-                    where: {
-                        teamId: { in: teamIds },
-                        team: { captainId: artistId }
-                    },
+                    where: { teamId: { in: captainTeamIds } },
                     data: { score: { decrement: points * 2 } }
                 });
             }
