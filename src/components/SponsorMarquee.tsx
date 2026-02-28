@@ -29,26 +29,43 @@ export default function SponsorMarquee() {
 
     if (sponsors.length === 0) return null;
 
-    // Use a single set for the entry-style animation from the right
-    const list = sponsors;
-
     return (
         <div className="w-full py-12 bg-white/2 backdrop-blur-sm border-y border-gray-800/30 overflow-hidden relative group">
-            <div className="flex items-center gap-12 animate-marquee whitespace-nowrap">
-                {list.map((sponsor, idx) => (
-                    <div
-                        key={`${sponsor.id}-${idx}`}
-                        className="flex-shrink-0 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
-                    >
-                        <Image
-                            src={sponsor.logoUrl}
-                            alt={sponsor.name}
-                            width={160}
-                            height={60}
-                            className="h-10 md:h-12 w-auto object-contain"
-                        />
-                    </div>
-                ))}
+            <div className="flex w-max animate-marquee items-center translate-x-0">
+                {/* Screen 1 */}
+                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12">
+                    {sponsors.map((sponsor) => (
+                        <div
+                            key={`${sponsor.id}-1`}
+                            className="flex-shrink-0 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+                        >
+                            <Image
+                                src={sponsor.logoUrl}
+                                alt={sponsor.name}
+                                width={160}
+                                height={60}
+                                className="h-10 md:h-12 w-auto object-contain"
+                            />
+                        </div>
+                    ))}
+                </div>
+                {/* Screen 2 - Perfect Duplicate */}
+                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12">
+                    {sponsors.map((sponsor) => (
+                        <div
+                            key={`${sponsor.id}-2`}
+                            className="flex-shrink-0 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+                        >
+                            <Image
+                                src={sponsor.logoUrl}
+                                alt={sponsor.name}
+                                width={160}
+                                height={60}
+                                className="h-10 md:h-12 w-auto object-contain"
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Gradient Overlays */}
