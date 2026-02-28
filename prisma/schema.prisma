@@ -40,7 +40,7 @@ model Team {
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
   image     String?
-  user      User         @relation(fields: [userId], references: [id])
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   leagues   TeamLeague[]
   artists   Artist[]     @relation("TeamArtists")
 }
@@ -59,7 +59,7 @@ model TeamLeague {
   leagueId String
   score    Int    @default(0)
   league   League @relation(fields: [leagueId], references: [id])
-  team     Team   @relation(fields: [teamId], references: [id])
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, leagueId])
 }
