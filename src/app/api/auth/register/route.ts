@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { sendEmail } from "@/lib/email";
-import { welcomeEmail } from "@/lib/email-templates";
+import { verificationEmail } from "@/lib/email-templates";
+import crypto from "crypto";
 
 export async function POST(req: Request) {
     try {
@@ -22,23 +23,25 @@ export async function POST(req: Request) {
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
+        const verificationToken = crypto.randomUUID();
 
         const user = await prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
+                verificationToken
             }
         });
 
-        // Send Welcome Email
+        // Send Verification Email
         try {
             await sendEmail({
                 to: email,
-                subject: "Benvenuto su FantaPiazza! 🎠",
-                body: welcomeEmail(email)
+                subject: "Verifica il tuo account FantaPiazza 🎠",
+                body: verificationEmail(verificationToken)
             });
         } catch (err) {
-            console.error("WELCOME_EMAIL_ERROR", err);
+            console.error("VERIFICATION_EMAIL_ERROR", err);
         }
 
         return NextResponse.json({ id: user.id, email: user.email, role: user.role });

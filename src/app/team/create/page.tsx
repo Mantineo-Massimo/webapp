@@ -348,9 +348,15 @@ export default function CreateTeamPage() {
 
                         {error && <div className="mt-4 p-3 bg-red-900/50 border border-red-500 rounded-xl text-red-200 text-sm">{error}</div>}
 
+                        {!captainId && selectedArtists.length === 5 && (
+                            <p className="mt-4 text-center text-oro text-xs font-bold uppercase tracking-widest animate-pulse">
+                                ⚠️ Scegli un Capitano per continuare
+                            </p>
+                        )}
+
                         <button
                             onClick={saveTeam}
-                            disabled={selectedArtists.length !== 5 || !teamName.trim() || loading || remainingBudget < 0 || isExpired}
+                            disabled={selectedArtists.length !== 5 || !teamName.trim() || !captainId || loading || remainingBudget < 0 || isExpired}
                             className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 shadow-xl
                                 ${isExpired
                                     ? "bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700"

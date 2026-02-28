@@ -30,6 +30,10 @@ export const authOptions: NextAuthOptions = {
                     return null
                 }
 
+                if (!user.emailVerified) {
+                    throw new Error("Email non verificata. Controlla la tua casella di posta.")
+                }
+
                 return {
                     id: user.id,
                     email: user.email,

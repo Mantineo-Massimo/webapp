@@ -22,8 +22,8 @@ export async function POST(req: Request) {
         const { teamName, artistIds, image, captainId } = body;
 
         // Validation
-        if (!teamName || !artistIds || artistIds.length !== 5) {
-            return new NextResponse("Invalid request data. Must provide a team name and exactly 5 artists.", { status: 400 });
+        if (!teamName || !artistIds || artistIds.length !== 5 || !captainId) {
+            return new NextResponse("Dati non validi. Nome squadra, 5 artisti e un Capitano sono obbligatori.", { status: 400 });
         }
 
         // --- Deadline Check ---
@@ -157,8 +157,8 @@ export async function PUT(req: Request) {
         const body = await req.json();
         const { teamName, artistIds, image, captainId } = body;
 
-        if (!teamName || !artistIds || artistIds.length !== 5) {
-            return new NextResponse("Invalid request data", { status: 400 });
+        if (!teamName || !artistIds || artistIds.length !== 5 || !captainId) {
+            return new NextResponse("Dati non validi. Nome squadra, 5 artisti e un Capitano sono obbligatori.", { status: 400 });
         }
 
         // Deadline check

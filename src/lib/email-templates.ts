@@ -134,3 +134,15 @@ export const newArtistEmail = (name: string, cost: number) => emailWrapper(`
         <a href="https://fantapiazza.it/team/create" class="button">Gestisci Squadra</a>
     </div>
 `);
+
+export const verificationEmail = (token: string) => emailWrapper(`
+    <h1 class="h1">Verifica la tua Email 📧</h1>
+    <p class="text">Grazie per esserti iscritto a <strong>FantaPiazza</strong>! Per completare la registrazione e iniziare a creare la tua squadra, clicca sul pulsante qui sotto:</p>
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="https://fantapiazza.it/api/auth/verify?token=${token}" class="button">Verifica Account</a>
+    </div>
+    <p class="text" style="margin-top: 40px; font-size: 12px; color: #94a3b8;">
+        Se il pulsante non funziona, copia e incolla questo link nel tuo browser:<br>
+        https://fantapiazza.it/api/auth/verify?token=${token}
+    </p>
+`);
