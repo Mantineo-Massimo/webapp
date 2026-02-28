@@ -43,13 +43,13 @@ export default async function Home() {
           {session ? (
             <>
               <Link
-                href="/team"
+                href="/team/create"
                 className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
               >
                 La mia Squadra
               </Link>
               <Link
-                href="/classifica"
+                href="/leaderboards"
                 className="px-8 py-3 rounded-full bg-viola text-white font-bold text-lg hover:bg-purple-800 transition-all border border-purple-500 shadow-[0_0_15px_rgba(88,28,135,0.4)] transform hover:scale-105"
               >
                 Classifica
