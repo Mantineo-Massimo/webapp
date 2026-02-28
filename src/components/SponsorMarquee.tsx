@@ -29,8 +29,8 @@ export default function SponsorMarquee() {
 
     if (sponsors.length === 0) return null;
 
-    // Double the array for a perfect infinite scroll loop (0% to -50%)
-    const list = [...sponsors, ...sponsors];
+    // Use a single set for the entry-style animation from the right
+    const list = sponsors;
 
     return (
         <div className="w-full py-12 bg-white/2 backdrop-blur-sm border-y border-gray-800/30 overflow-hidden relative group">
