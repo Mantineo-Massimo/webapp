@@ -1,21 +1,38 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { prisma } from "@/lib/prisma";
+import { useEffect, useState } from "react";
 import CountdownTimer from "@/components/CountdownTimer";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { useSession } from "next-auth/react";
 import SponsorMarquee from "@/components/SponsorMarquee";
+import NewsSection from "@/components/NewsSection";
+import HowToPlay from "@/components/HowToPlay";
+import { motion } from "framer-motion";
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-  const settings = await prisma.systemSettings.findFirst();
-  const deadlineIso = settings?.draftDeadline ? settings.draftDeadline.toISOString() : null;
+export default function Home() {
+  const { data: session } = useSession();
+  const [deadline, setDeadline] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.draftDeadline) setDeadline(new Date(data.draftDeadline).toISOString());
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   return (
     <main className="min-h-screen text-white flex flex-col pt-56 md:pt-44 items-center">
 
       {/* Hero Section */}
-      <section className="w-full px-6 flex flex-col items-center justify-center text-center max-w-5xl space-y-8 animate-fade-in">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full px-6 flex flex-col items-center justify-center text-center max-w-5xl space-y-8"
+      >
         <div className="relative inline-block mt-8 mb-4">
           <Image
             src="/fanta-logo.png"
@@ -33,13 +50,23 @@ export default async function Home() {
           di Morgana e Orum.&quot;
         </p>
 
-        {deadlineIso && (
-          <div className="mt-8 mb-4 w-full flex justify-center">
-            <CountdownTimer targetDate={deadlineIso} />
-          </div>
+        {deadline && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="mt-8 mb-4 w-full flex justify-center"
+          >
+            <CountdownTimer targetDate={deadline} />
+          </motion.div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-4 pt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="flex flex-col sm:flex-row gap-4 pt-6"
+        >
           {session ? (
             <>
               <Link
@@ -71,11 +98,21 @@ export default async function Home() {
               </Link>
             </>
           )}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
+
+      {/* How To Play Section */}
+      <div className="w-full mt-32">
+        <HowToPlay />
+      </div>
+
+      {/* News Section */}
+      <div className="w-full">
+        <NewsSection />
+      </div>
 
       {/* Sponsor Marquee */}
-      <div className="w-full mt-24">
+      <div className="w-full mt-12 mb-24">
         <SponsorMarquee />
       </div>
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
+import SocialShare from "@/components/SocialShare";
 
 import CountdownTimer from "@/components/CountdownTimer";
 
@@ -27,6 +28,7 @@ export default function CreateTeamPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [teamId, setTeamId] = useState<string | null>(null);
     const [initialFetchDone, setInitialFetchDone] = useState(false);
 
     const [deadline, setDeadline] = useState<string | null>(null);
@@ -51,6 +53,7 @@ export default function CreateTeamPage() {
             .then(data => {
                 if (data && data.id) {
                     setIsEditing(true);
+                    setTeamId(data.id);
                     setTeamName(data.name);
                     setTeamImage(data.image || null);
                     setSelectedArtists(data.artists || []);
@@ -340,6 +343,18 @@ export default function CreateTeamPage() {
                         >
                             {loading ? "Salvataggio..." : isExpired ? "Iscrizioni Chiuse" : (isEditing ? "Salva Modifiche" : "Fonda Squadra")}
                         </button>
+
+                        {isEditing && teamId && (
+                            <div className="mt-8 pt-6 border-t border-gray-800">
+                                <p className="text-[10px] font-black uppercase text-gray-500 mb-4 tracking-[0.2em] text-center">Orgoglioso della tua squadra? Condividila!</p>
+                                <div className="flex justify-center">
+                                    <SocialShare
+                                        url={`${typeof window !== 'undefined' ? window.location.origin : ''}/team/${teamId}`}
+                                        title={`Ho appena creato la mia squadra ${teamName} su FantaPiazza! Vieni a vederla! 🚀`}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

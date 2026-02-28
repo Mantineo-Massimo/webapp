@@ -31,26 +31,24 @@ export default function SponsorMarquee() {
 
     return (
         <div className="w-full py-12 bg-white/2 backdrop-blur-sm border-y border-gray-800/30 overflow-hidden relative group">
-            <div className="flex w-max animate-marquee items-center translate-x-0">
+            <div className="flex w-max animate-marquee items-center translate-x-0 h-full">
                 {/* Screen 1 */}
-                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12">
+                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12 h-full">
                     {sponsors.map((sponsor) => (
                         <div
                             key={`${sponsor.id}-1`}
                             className="flex-shrink-0 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
                         >
-                            <Image
+                            <img
                                 src={sponsor.logoUrl}
                                 alt={sponsor.name}
-                                width={160}
-                                height={60}
                                 className="h-10 md:h-12 w-auto object-contain"
                             />
                         </div>
                     ))}
                 </div>
                 {/* Screen 2 - Perfect Duplicate */}
-                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12">
+                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12 h-full">
                     {sponsors.map((sponsor) => (
                         <div
                             key={`${sponsor.id}-2`}

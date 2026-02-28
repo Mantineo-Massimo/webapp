@@ -17,7 +17,8 @@ import {
     FiList,
     FiPlus,
     FiCheck,
-    FiX
+    FiX,
+    FiFileText
 } from "react-icons/fi";
 
 type Artist = {
@@ -28,7 +29,7 @@ type Artist = {
     totalScore: number;
 };
 
-type Tab = "dashboard" | "artists" | "points" | "history" | "settings" | "regole" | "participants" | "sponsors";
+type Tab = "dashboard" | "artists" | "points" | "history" | "settings" | "regole" | "participants" | "sponsors" | "news";
 
 type RuleDefinition = {
     id: string;
@@ -85,6 +86,13 @@ export default function AdminDashboard() {
     const [teamsLoading, setTeamsLoading] = useState(false);
     const [sponsors, setSponsors] = useState<any[]>([]);
     const [sponsorsLoading, setSponsorsLoading] = useState(false);
+    const [news, setNews] = useState<any[]>([]);
+    const [newsLoading, setNewsLoading] = useState(false);
+    const [newsTitle, setNewsTitle] = useState("");
+    const [newsContent, setNewsContent] = useState("");
+    const [newsImage, setNewsImage] = useState<string | null>(null);
+    const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
+    const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
 
     // User Edit State
     const [editingUser, setEditingUser] = useState<any>(null);
@@ -253,6 +261,62 @@ export default function AdminDashboard() {
             .finally(() => setSponsorsLoading(false));
     };
 
+    const loadNews = () => {
+        setNewsLoading(true);
+        fetch("/api/admin/news")
+            .then(res => res.json())
+            .then(data => setNews(data))
+            .catch(err => console.error(err))
+            .finally(() => setNewsLoading(false));
+    };
+
+    const handleSaveNews = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const method = editingNewsId ? "PUT" : "POST";
+            const res = await fetch("/api/admin/news", {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: editingNewsId,
+                    title: newsTitle,
+                    content: newsContent,
+                    image: newsImage
+                })
+            });
+
+            if (!res.ok) throw new Error("Errore durante il salvataggio della notizia");
+
+            setSuccess(editingNewsId ? "Notizia aggiornata" : "Notizia creata");
+            setIsNewsModalOpen(false);
+            setNewsTitle("");
+            setNewsContent("");
+            setNewsImage(null);
+            setEditingNewsId(null);
+            loadNews();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteNews = async (id: string) => {
+        if (!confirm("Vuoi davvero eliminare questa notizia?")) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/admin/news?id=${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Errore durante l'eliminazione");
+            setSuccess("Notizia eliminata");
+            loadNews();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (session?.user?.role === "ADMIN") {
             loadArtists();
@@ -262,6 +326,7 @@ export default function AdminDashboard() {
             if (activeTab === "regole") loadRules();
             if (activeTab === "participants") loadUsers();
             if (activeTab === "sponsors") loadSponsors();
+            if (activeTab === "news") loadNews();
         }
     }, [session]);
 
@@ -270,6 +335,7 @@ export default function AdminDashboard() {
         if (activeTab === "regole") loadRules();
         if (activeTab === "participants") loadUsers();
         if (activeTab === "sponsors") loadSponsors();
+        if (activeTab === "news") loadNews();
     }, [activeTab]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1210,6 +1276,77 @@ export default function AdminDashboard() {
                         </motion.div>
                     )}
 
+                    {/* NEWS TAB */}
+                    {activeTab === "news" && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#131d36] p-8 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-2xl font-bold flex items-center gap-3">
+                                    <FiFileText className="text-oro" /> Comunicazioni e News
+                                </h2>
+                                <button
+                                    onClick={() => {
+                                        setEditingNewsId(null);
+                                        setNewsTitle("");
+                                        setNewsContent("");
+                                        setNewsImage(null);
+                                        setIsNewsModalOpen(true);
+                                    }}
+                                    className="px-4 py-2 bg-oro text-blunotte rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)] flex items-center gap-2"
+                                >
+                                    <FiPlus size={18} /> Nuova Notizia
+                                </button>
+                            </div>
+
+                            {newsLoading ? (
+                                <div className="text-center py-20 text-gray-600 animate-pulse">Caricamento news...</div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {news.map((item: any) => (
+                                        <div key={item.id} className="bg-[#0a0f1c]/50 border border-gray-800 rounded-2xl overflow-hidden group hover:border-oro/50 transition-all">
+                                            {item.image && (
+                                                <div className="h-40 w-full overflow-hidden border-b border-gray-800">
+                                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                </div>
+                                            )}
+                                            <div className="p-6">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="text-xl font-bold text-white leading-tight">{item.title}</h3>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditingNewsId(item.id);
+                                                                setNewsTitle(item.title);
+                                                                setNewsContent(item.content);
+                                                                setNewsImage(item.image);
+                                                                setIsNewsModalOpen(true);
+                                                            }}
+                                                            className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-oro transition-all"
+                                                        >
+                                                            <FiEdit2 size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteNews(item.id)}
+                                                            className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-red-500 transition-all"
+                                                        >
+                                                            <FiTrash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p className="text-gray-400 text-sm line-clamp-3 mb-4">{item.content}</p>
+                                                <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">
+                                                    Pubblicato il {new Date(item.createdAt).toLocaleDateString('it-IT')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {news.length === 0 && (
+                                        <div className="col-span-full py-20 text-center text-gray-600 italic">Nessuna notizia pubblicata. Clicca su "Nuova Notizia" per iniziare.</div>
+                                    )}
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+
                 </div>
                 {/* User Edit Modal */}
                 {isUserModalOpen && editingUser && (
@@ -1286,6 +1423,98 @@ export default function AdminDashboard() {
                         </motion.div>
                     </div>
                 )}
+
+                {/* NEWS MODAL */}
+                <AnimatePresence>
+                    {isNewsModalOpen && (
+                        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="relative bg-[#131d36] w-full max-w-2xl rounded-3xl border border-gray-700 shadow-2xl overflow-hidden p-8 z-10"
+                            >
+                                <div className="flex justify-between items-center mb-8">
+                                    <h2 className="text-3xl font-black text-oro">
+                                        {editingNewsId ? "Modifica Notizia" : "Nuova Notizia"}
+                                    </h2>
+                                    <button onClick={() => setIsNewsModalOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                                        <FiX size={24} />
+                                    </button>
+                                </div>
+
+                                <form onSubmit={handleSaveNews} className="space-y-6">
+                                    <div>
+                                        <label className="block text-xs font-black uppercase text-gray-500 mb-2">Titolo</label>
+                                        <input
+                                            type="text"
+                                            value={newsTitle}
+                                            onChange={(e) => setNewsTitle(e.target.value)}
+                                            required
+                                            className="w-full bg-[#0a0f1c]/50 border border-gray-800 rounded-xl px-4 py-3 text-white focus:border-oro outline-none transition-all"
+                                            placeholder="Inserisci un titolo accattivante..."
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-black uppercase text-gray-500 mb-2">Contenuto</label>
+                                        <textarea
+                                            value={newsContent}
+                                            onChange={(e) => setNewsContent(e.target.value)}
+                                            required
+                                            rows={6}
+                                            className="w-full bg-[#0a0f1c]/50 border border-gray-800 rounded-xl px-4 py-3 text-white focus:border-oro outline-none transition-all resize-none"
+                                            placeholder="Scrivi qui il contenuto della notizia..."
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-black uppercase text-gray-500 mb-2">Immagine (URL o Upload)</label>
+                                        <div className="flex gap-4 items-center">
+                                            <div className="flex-1">
+                                                <input
+                                                    type="text"
+                                                    value={newsImage || ""}
+                                                    onChange={(e) => setNewsImage(e.target.value)}
+                                                    className="w-full bg-[#0a0f1c]/50 border border-gray-800 rounded-xl px-4 py-3 text-white focus:border-oro outline-none transition-all"
+                                                    placeholder="URL immagine..."
+                                                />
+                                            </div>
+                                            <label className="p-3 bg-white/5 hover:bg-white/10 border border-gray-800 rounded-xl cursor-pointer text-gray-400 transition-all">
+                                                <FiUpload size={20} />
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (!file) return;
+                                                        setIsUploading(true);
+                                                        const formData = new FormData();
+                                                        formData.append("file", file);
+                                                        try {
+                                                            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+                                                            const data = await res.json();
+                                                            setNewsImage(data.url);
+                                                        } catch (err) { console.error(err); }
+                                                        finally { setIsUploading(false); }
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full py-4 bg-gradient-to-r from-oro to-ocra text-blunotte font-black rounded-xl hover:scale-[1.02] transition-all shadow-[0_10px_20px_rgba(255,215,0,0.2)] disabled:opacity-50"
+                                    >
+                                        {loading ? "Salvataggio..." : "Pubblica Notizia"}
+                                    </button>
+                                </form>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
             </div>
         </main>
     );

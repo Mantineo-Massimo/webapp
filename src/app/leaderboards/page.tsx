@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import SocialShare from "@/components/SocialShare";
+import LeaderboardSkeleton from "./Skeleton";
 
 type ArtistEvent = {
     id: string;
@@ -58,7 +60,12 @@ export default function LeaderboardsPage() {
             });
     }, []);
 
-    if (loading) return <div className="min-h-screen bg-blunotte flex items-center justify-center text-white">Caricamento delle classifiche...</div>;
+    if (loading) return (
+        <main className="min-h-screen text-white p-6 md:p-12 pt-56 md:pt-44 pb-32">
+            <LeaderboardSkeleton />
+        </main>
+    );
+
     if (!leagues.length) return <div className="min-h-screen bg-blunotte flex items-center justify-center text-white">Nessuna lega disponibile al momento.</div>;
 
     const currentLeague = leagues.find(l => l.name === activeTab);
@@ -201,6 +208,14 @@ export default function LeaderboardsPage() {
                                 <div className="mt-8 pt-6 border-t border-gray-800 flex justify-between items-center">
                                     <span className="text-gray-400 font-bold">Punteggio Totale</span>
                                     <span className="text-3xl font-black text-oro">{selectedTeam.score} pt</span>
+                                </div>
+
+                                {/* Social Share */}
+                                <div className="mt-6">
+                                    <SocialShare
+                                        url={`${window.location.origin}/team/${(selectedTeam.team as any).id || ""}`}
+                                        title={`Guarda la squadra ${selectedTeam.team.name} su FantaPiazza! 🏆`}
+                                    />
                                 </div>
                             </motion.div>
                         </div>
