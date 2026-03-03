@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import SocialShare from "@/components/SocialShare";
 import { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const { id } = await params;
     const team = await prisma.team.findUnique({
-        where: { id: params.id },
+        where: { id: id },
         select: { name: true }
     });
     if (!team) return { title: "Squadra non trovata" };
@@ -28,9 +29,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     };
 }
 
-export default async function TeamProfilePage({ params }: { params: { id: string } }) {
+export default async function TeamProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const team = await prisma.team.findFirst({
-        where: { id: params.id },
+        where: { id: id },
         include: {
             artists: {
                 orderBy: {
