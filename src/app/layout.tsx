@@ -17,7 +17,30 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "FantaPiazza | Morgana e Orum",
-  description: "Costruisci la tua squadra, scommetti sui tuoi Armoni e conquista le leghe delle associazioni Morgana e Orum.",
+  description: "Costruisci la tua squadra, scommetti sui tuoi Armoni e conquista la Classifica Generale delle associazioni Morgana e Orum.",
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "https://fantapiazza.it"),
+  openGraph: {
+    title: "FantaPiazza | Il gioco d'arte delle associazioni Morgana e Orum",
+    description: "Crea la tua squadra, scegli i tuoi Armoni e scala la classifica della Piazza!",
+    url: "/",
+    siteName: "FantaPiazza",
+    images: [
+      {
+        url: "/fanta-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "FantaPiazza Logo",
+      },
+    ],
+    locale: "it_IT",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FantaPiazza | Morgana e Orum",
+    description: "Il Fantagioco dove l'Arte incontra la Piazza.",
+    images: ["/fanta-logo.png"],
+  },
   icons: {
     icon: [
       { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },

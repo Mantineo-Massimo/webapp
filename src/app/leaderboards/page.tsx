@@ -43,6 +43,23 @@ export default function LeaderboardsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedTeam, setSelectedTeam] = useState<TeamResult | null>(null);
     const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
+    const [detailLoading, setDetailLoading] = useState(false);
+
+    const handleArtistClick = async (artist: Artist) => {
+        setDetailLoading(true);
+        setSelectedArtist(artist);
+        try {
+            const res = await fetch(`/api/artists/${artist.id}`);
+            if (res.ok) {
+                const data = await res.json();
+                setSelectedArtist(data);
+            }
+        } catch (err) {
+            console.error("Error fetching artist details:", err);
+        } finally {
+            setDetailLoading(false);
+        }
+    };
 
     useEffect(() => {
         Promise.all([
@@ -152,7 +169,7 @@ export default function LeaderboardsPage() {
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.05 }}
-                                            onClick={() => setSelectedArtist(artist)}
+                                            onClick={() => handleArtistClick(artist)}
                                             className="border-b border-gray-800/50 hover:bg-[#1f2937] transition-colors cursor-pointer group"
                                         >
                                             <td className="px-6 py-4">
@@ -240,7 +257,7 @@ export default function LeaderboardsPage() {
                                         {selectedTeam.team.artists.map((artist) => (
                                             <div
                                                 key={artist.id}
-                                                onClick={() => setSelectedArtist(artist)}
+                                                onClick={() => handleArtistClick(artist)}
                                                 className="flex justify-between items-center py-4 cursor-pointer hover:bg-white/5 px-2 -mx-2 rounded-xl transition-colors group/artist"
                                             >
                                                 <div className="flex items-center gap-3">
@@ -329,7 +346,12 @@ export default function LeaderboardsPage() {
                                 </div>
 
                                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                                    {selectedArtist.events && selectedArtist.events.length > 0 ? (
+                                    {detailLoading ? (
+                                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                                            <div className="w-8 h-8 border-4 border-oro/30 border-t-oro rounded-full animate-spin"></div>
+                                            <p className="text-gray-500 text-sm font-bold uppercase tracking-widest">Caricamento...</p>
+                                        </div>
+                                    ) : selectedArtist.events && selectedArtist.events.length > 0 ? (
                                         selectedArtist.events.map((event) => (
                                             <div key={event.id} className="bg-[#1e293b]/50 border border-gray-800 p-4 rounded-2xl flex justify-between items-center gap-4">
                                                 <div className="flex-1">

@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 30; // Cache for 30 seconds
 
 export async function GET() {
     try {
         const artists = await prisma.artist.findMany({
-            include: {
-                events: {
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                }
+            select: {
+                id: true,
+                name: true,
+                image: true,
+                totalScore: true,
+                // Events removed from main list, loaded on detail click
             },
             orderBy: {
                 totalScore: 'desc'

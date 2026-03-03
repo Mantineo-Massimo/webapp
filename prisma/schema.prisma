@@ -75,6 +75,8 @@ model BonusMalusEvent {
   artist      Artist          @relation(fields: [artistId], references: [id])
   createdBy   User?           @relation("AdminEvents", fields: [createdById], references: [id])
   rule        RuleDefinition? @relation(fields: [ruleId], references: [id])
+
+  @@index([artistId])
 }
 
 model SystemSettings {

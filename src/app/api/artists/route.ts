@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const revalidate = 60; // Cache for 1 minute
+
 // GET /api/artists
-// Fetch all available artists
 export async function GET() {
     try {
         const artists = await prisma.artist.findMany({

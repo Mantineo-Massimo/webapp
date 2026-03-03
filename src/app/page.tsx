@@ -71,9 +71,12 @@ export default function Home() {
             <>
               <Link
                 href="/team/create"
-                className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
+                className={`px-8 py-3 rounded-full font-bold text-lg transition-all shadow-lg transform hover:scale-105 ${deadline && new Date() > new Date(deadline)
+                  ? "bg-gray-800 text-gray-400 cursor-not-allowed border border-gray-700"
+                  : "bg-oro text-blunotte hover:bg-yellow-300 shadow-oro/50"
+                  }`}
               >
-                La mia Squadra
+                {deadline && new Date() > new Date(deadline) ? "La mia Squadra" : "La mia Squadra"}
               </Link>
               <Link
                 href="/leaderboards"
@@ -84,18 +87,29 @@ export default function Home() {
             </>
           ) : (
             <>
-              <Link
-                href="/auth/register"
-                className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
-              >
-                Inizia l&apos;Avventura
-              </Link>
-              <Link
-                href="/auth/login"
-                className="px-8 py-3 rounded-full bg-viola text-white font-bold text-lg hover:bg-purple-800 transition-all border border-purple-500 shadow-[0_0_15px_rgba(88,28,135,0.4)] transform hover:scale-105"
-              >
-                Accedi
-              </Link>
+              {(!deadline || new Date() <= new Date(deadline)) ? (
+                <>
+                  <Link
+                    href="/auth/register"
+                    className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
+                  >
+                    Inizia l&apos;Avventura
+                  </Link>
+                  <Link
+                    href="/auth/login"
+                    className="px-8 py-3 rounded-full bg-viola text-white font-bold text-lg hover:bg-purple-800 transition-all border border-purple-500 shadow-[0_0_15px_rgba(88,28,135,0.4)] transform hover:scale-105"
+                  >
+                    Accedi
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/leaderboards"
+                  className="px-8 py-3 rounded-full bg-oro text-blunotte font-bold text-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(255,215,0,0.5)] transform hover:scale-105"
+                >
+                  Vedi la Classifica
+                </Link>
+              )}
             </>
           )}
         </motion.div>

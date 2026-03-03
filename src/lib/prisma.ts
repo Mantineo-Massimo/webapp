@@ -13,9 +13,9 @@ const globalForPrisma = global as unknown as {
 if (!globalForPrisma.pool) {
     globalForPrisma.pool = new Pool({
         connectionString,
-        max: 2, // Low pool size for serverless
+        max: 10, // Increased for production peak (2000 users)
         idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
+        connectionTimeoutMillis: 5000,
     })
 }
 

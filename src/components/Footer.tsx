@@ -30,7 +30,7 @@ export default function Footer() {
                         <nav className="flex flex-col gap-4 text-sm font-bold text-gray-400">
                             <Link href="/" className="hover:text-white transition-colors">Home</Link>
                             <Link href="/regolamento" className="hover:text-white transition-colors">Regolamento</Link>
-                            <Link href="/classifica" className="hover:text-white transition-colors">Classifica</Link>
+                            <Link href="/leaderboards" className="hover:text-white transition-colors">Classifica</Link>
                         </nav>
                     </div>
 
@@ -38,10 +38,10 @@ export default function Footer() {
                     <div className="text-center md:text-right space-y-6">
                         <h4 className="text-oro font-black uppercase tracking-widest text-xs mb-6">Connettiti</h4>
                         <div className="flex justify-center md:justify-end gap-4">
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-oro hover:text-blunotte transition-all border border-gray-800">
+                            <a href="https://www.instagram.com/piazzadellarte_/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-oro hover:text-blunotte transition-all border border-gray-800">
                                 <FiInstagram size={20} />
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-oro hover:text-blunotte transition-all border border-gray-800">
+                            <a href="https://www.facebook.com/PiazzadellArte" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-oro hover:text-blunotte transition-all border border-gray-800">
                                 <FiFacebook size={20} />
                             </a>
                             <a href="mailto:info@fantapiazza.it" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-oro hover:text-blunotte transition-all border border-gray-800">
@@ -54,10 +54,13 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800/30 pt-8 text-center">
+                <div className="border-t border-gray-800/30 pt-8 text-center space-y-4">
                     <p className="text-gray-600 text-[10px] uppercase tracking-widest">
                         &copy; {new Date().getFullYear()} FantaPiazza. Tutti i diritti riservati.
                     </p>
+                    <div className="flex justify-center gap-6">
+                        <Link href="/privacy" className="text-gray-700 hover:text-gray-400 text-[10px] uppercase tracking-widest transition-colors">Privacy Policy</Link>
+                    </div>
                 </div>
             </div>
         </footer>
