@@ -26,6 +26,7 @@ type Artist = {
     name: string;
     cost: number;
     image?: string | null;
+    category?: string | null;
     totalScore: number;
 };
 
@@ -51,6 +52,7 @@ export default function AdminDashboard() {
 
     // Artist Management State
     const [newName, setNewName] = useState("");
+    const [newCategory, setNewCategory] = useState("");
     const [newCost, setNewCost] = useState<number | "">("");
     const [newImage, setNewImage] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -401,7 +403,8 @@ export default function AdminDashboard() {
                     id: editingArtistId,
                     name: newName,
                     cost: newCost,
-                    image: newImage
+                    image: newImage,
+                    category: newCategory
                 })
             });
 
@@ -409,6 +412,7 @@ export default function AdminDashboard() {
 
             setSuccess(`Artista ${newName} ${editingArtistId ? 'modificato' : 'aggiunto'} con successo.`);
             setNewName("");
+            setNewCategory("");
             setNewCost("");
             setNewImage(null);
             setEditingArtistId(null);
@@ -424,6 +428,7 @@ export default function AdminDashboard() {
     const startEditingArtist = (artist: Artist) => {
         setEditingArtistId(artist.id);
         setNewName(artist.name);
+        setNewCategory(artist.category || "");
         setNewCost(artist.cost);
         setNewImage(artist.image || null);
         // Scroll to form
@@ -433,6 +438,7 @@ export default function AdminDashboard() {
     const cancelEditingArtist = () => {
         setEditingArtistId(null);
         setNewName("");
+        setNewCategory("");
         setNewCost("");
         setNewImage(null);
     };
@@ -754,6 +760,16 @@ export default function AdminDashboard() {
                                             value={newName}
                                             onChange={e => setNewName(e.target.value)}
                                             placeholder="Inserisci nome..."
+                                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Categoria</label>
+                                        <input
+                                            type="text"
+                                            value={newCategory}
+                                            onChange={e => setNewCategory(e.target.value)}
+                                            placeholder="es. Cantante"
                                             className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
                                         />
                                     </div>

@@ -329,7 +329,7 @@ export default function CreateTeamPage() {
                         {/* Team Image & Name */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-6">
-                                <div className="relative w-24 h-24 rounded-[1.5rem] overflow-hidden bg-white/5 border border-white/10 shadow-inner group">
+                                <div className="relative w-24 h-24 aspect-square rounded-[1.5rem] overflow-hidden bg-white/5 border border-white/10 shadow-inner group flex-shrink-0">
                                     <Image src={teamImage || "/fanta-logo.png"} alt="Squadra" fill className="object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
                                     {isUploading && (
                                         <div className="absolute inset-0 bg-blunotte/60 flex items-center justify-center">

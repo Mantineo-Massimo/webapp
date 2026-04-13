@@ -18,7 +18,8 @@ type Artist = {
     id: string;
     name: string;
     totalScore: number;
-    image?: string;
+    image?: string | null;
+    category?: string | null;
     events?: ArtistEvent[];
 };
 
@@ -144,7 +145,7 @@ export default function LeaderboardsPage() {
                             }`}
                         >
                             <FiStar size={16} />
-                            Top Armoni
+                            Top Artisti
                         </button>
                     </div>
                 </div>
@@ -155,7 +156,7 @@ export default function LeaderboardsPage() {
                             <thead>
                                 <tr className="bg-white/[0.03] text-gray-400">
                                     <th className="px-10 py-8 font-black text-[10px] uppercase tracking-[0.2em]">Posizione</th>
-                                    <th className="px-10 py-8 font-black text-[10px] uppercase tracking-[0.2em]">{viewMode === "teams" ? "Squadra" : "Armone"}</th>
+                                    <th className="px-10 py-8 font-black text-[10px] uppercase tracking-[0.2em]">{viewMode === "teams" ? "Squadra" : "Artista"}</th>
                                     <th className="px-10 py-8 font-black text-[10px] uppercase tracking-[0.2em] text-right">Performance</th>
                                 </tr>
                             </thead>
@@ -188,7 +189,7 @@ export default function LeaderboardsPage() {
                                                 </td>
                                                 <td className="px-10 py-8">
                                                     <div className="flex items-center gap-6">
-                                                        <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-oro/30 transition-all">
+                                                        <div className="relative w-14 h-14 aspect-square rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-oro/30 transition-all flex-shrink-0">
                                                             <Image
                                                                 src={t.team.image || "/fanta-logo.png"}
                                                                 alt={t.team.name}
@@ -250,7 +251,9 @@ export default function LeaderboardsPage() {
                                                         </div>
                                                         <div>
                                                             <h3 className="text-xl font-black group-hover:text-oro transition-colors">{artist.name}</h3>
-                                                            <span className="text-[10px] uppercase font-black tracking-widest text-white/20">Armone d&apos;Elite</span>
+                                                            <span className="text-[10px] uppercase font-black tracking-widest text-oro/40">
+                                                                {artist.category || "Artista d'Elite"}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -335,7 +338,6 @@ export default function LeaderboardsPage() {
                                                 </div>
                                                 <span className="text-xl font-black text-white/40">{artist.totalScore} <span className="text-[10px]">pt</span></span>
                                             </div>
-                                        ))}
                                     </div>
                                 </section>
 
