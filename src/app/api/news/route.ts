@@ -12,6 +12,9 @@ export async function GET() {
         return NextResponse.json(news);
     } catch (error: any) {
         console.error("Error fetching news:", error);
-        return NextResponse.json({ error: "Errore nel caricamento delle news" }, { status: 500 });
+        return NextResponse.json({ 
+            error: "Errore nel caricamento delle news",
+            details: error.message
+        }, { status: 500 });
     }
 }

@@ -9,8 +9,11 @@ export async function GET() {
             }
         });
         return NextResponse.json(sponsors);
-    } catch (error) {
+    } catch (error: any) {
         console.error("GET_SPONSORS_ERROR", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        return NextResponse.json({ 
+            error: "Errore nel caricamento degli sponsor",
+            details: error.message 
+        }, { status: 500 });
     }
 }

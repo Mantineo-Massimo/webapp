@@ -13,8 +13,11 @@ export async function GET() {
             });
         }
         return NextResponse.json(settings);
-    } catch (error) {
-        console.error("GET_SETTINGS_ERROR", error);
-        return new NextResponse("Internal Error", { status: 500 });
+    } catch (error: any) {
+        console.error("SETTINGS_GET_ERROR", error);
+        return NextResponse.json({ 
+            error: "Errore nel caricamento dei parametri di sistema",
+            details: error.message
+        }, { status: 500 });
     }
 }

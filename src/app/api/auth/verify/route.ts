@@ -29,8 +29,11 @@ export async function GET(req: Request) {
         // Redirect to login with success message
         return NextResponse.redirect(new URL("/auth/login?verified=true", req.url));
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("VERIFY_ERROR", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        return NextResponse.json({ 
+            error: "Errore durante la verifica dell'account",
+            details: error.message
+        }, { status: 500 });
     }
 }
