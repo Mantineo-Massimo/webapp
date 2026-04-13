@@ -9,7 +9,7 @@ import SponsorMarquee from "@/components/SponsorMarquee";
 import NewsSection from "@/components/NewsSection";
 import HowToPlay from "@/components/HowToPlay";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { FiChevronDown, FiPlay, FiAward } from "react-icons/fi";
+import { FiChevronDown, FiPlay, FiAward, FiExternalLink } from "react-icons/fi";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -166,11 +166,51 @@ export default function Home() {
            </div>
         </section>
 
+        <section className="w-full max-w-7xl mx-auto px-6">
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             className="glass p-12 rounded-[4rem] border-white/5 relative overflow-hidden group hover:border-oro/20 transition-all duration-700"
+           >
+             <div className="absolute top-0 right-10 text-white/[0.02] font-black text-9xl pointer-events-none group-hover:text-oro/[0.03] transition-colors">NETWORK</div>
+             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
+               <div className="space-y-6">
+                 <span className="text-oro font-black uppercase tracking-[0.5em] text-[10px]">Partner Istituzionale</span>
+                 <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Piazza dell&apos;<span className="text-gradient-oro">Arte</span></h2>
+                 <p className="text-gray-400 max-w-xl text-lg font-light leading-relaxed">
+                   Scopri l&apos;intero ecosistema di Morgana e O.R.U.M. La Piazza dell&apos;Arte è il cuore pulsante dove la cultura universitaria prende vita.
+                 </p>
+               </div>
+               <Link 
+                 href="https://morganaorum.vercel.app/it/network/piazzadellarte"
+                 target="_blank"
+                 className="group/btn relative px-10 py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 hover:-translate-y-1"
+               >
+                 Visita Sito <FiExternalLink className="group-hover/btn:text-oro transition-colors" />
+               </Link>
+             </div>
+           </motion.div>
+        </section>
+
+        {/* Riga decorativa stilizzata */}
         <section className="w-full">
-           <div className="py-20 bg-white/[0.02] border-y border-white/5">
-             <div className="max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                  <h2 className="text-4xl font-black uppercase tracking-tight">I Nostri <span className="text-oro">Sponsor</span></h2>
+           <div className="flex items-center gap-8 justify-center overflow-hidden">
+             <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+             <div className="flex-shrink-0 w-3 h-3 rounded-full border border-oro/40 animate-pulse"></div>
+             <div className="h-[1px] w-full bg-gradient-to-l from-transparent via-white/10 to-transparent"></div>
+           </div>
+        </section>
+
+        <section className="w-full">
+           <div className="py-24 bg-white/[0.02] border-y border-white/5 relative overflow-hidden">
+             {/* Background glow per gli sponsor */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-full bg-oro/[0.02] blur-[120px] pointer-events-none"></div>
+             
+             <div className="w-full">
+                <div className="text-center mb-20 px-6">
+                  <span className="text-oro font-black uppercase tracking-[0.3em] text-[10px] block mb-4">I Nostri Alleati</span>
+                  <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tight">I Nostri <span className="text-oro">Sponsor</span></h2>
                 </div>
                 <SponsorMarquee />
              </div>
