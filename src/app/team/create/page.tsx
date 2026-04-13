@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import SocialShare from "@/components/SocialShare";
-
 import CountdownTimer from "@/components/CountdownTimer";
+import Image from "next/image";
+import { FiCamera, FiCheck, FiInfo, FiLayers, FiDollarSign, FiZap, FiEdit3 } from "react-icons/fi";
 
 type Artist = {
     id: string;
@@ -63,7 +64,7 @@ export default function CreateTeamPage() {
                 setInitialFetchDone(true);
             })
             .catch(err => {
-                console.error("Failed to load generic team", err);
+                console.error("Failed to load team", err);
                 setInitialFetchDone(true);
             });
 
@@ -81,7 +82,6 @@ export default function CreateTeamPage() {
             .catch(err => console.error("Failed to load settings", err));
     }, []);
 
-    // Also check every second if expired
     useEffect(() => {
         if (!deadline) return;
         const interval = setInterval(() => {
@@ -103,11 +103,11 @@ export default function CreateTeamPage() {
             if (captainId === artist.id) setCaptainId(null);
         } else {
             if (selectedArtists.length >= 5) {
-                setError("Puoi selezionare massimo 5 artisti.");
+                setError("Massimo 5 artisti consentiti.");
                 return;
             }
             if (remainingBudget - artist.cost < 0) {
-                setError("Armoni insufficienti.");
+                setError("Budget insufficiente.");
                 return;
             }
             setError("");
@@ -133,7 +133,7 @@ export default function CreateTeamPage() {
 
             if (!res.ok) {
                 const errorText = await res.text();
-                throw new Error(errorText || "Errore durante l'upload");
+                throw new Error(errorText || "Upload fallito");
             }
             const data = await res.json();
             setTeamImage(data.url);
@@ -145,16 +145,17 @@ export default function CreateTeamPage() {
     };
 
     const saveTeam = async () => {
-        if (isExpired) {
-            setError("Le iscrizioni sono chiuse!");
-            return;
-        }
+        if (isExpired) return;
         if (selectedArtists.length !== 5) {
-            setError("Devi selezionare esattamente 5 artisti.");
+            setError("Seleziona esattamente 5 artisti.");
             return;
         }
         if (!teamName.trim()) {
-            setError("Inserire un nome per la squadra.");
+            setError("Il nome della squadra è richiesto.");
+            return;
+        }
+        if (!captainId) {
+            setError("Devi scegliere un Capitano.");
             return;
         }
 
@@ -176,102 +177,118 @@ export default function CreateTeamPage() {
 
             if (!res.ok) {
                 const msg = await res.text();
-                setError(msg || "Errore durante il salvataggio.");
+                setError(msg || "Errore di salvataggio.");
             } else {
                 router.push("/leaderboards");
             }
         } catch {
-            setError("Errore di rete.");
+            setError("Errore di connessione.");
         } finally {
             setLoading(false);
         }
     };
 
-    if (status === "loading" || !initialFetchDone) return <div className="min-h-screen bg-blunotte flex items-center justify-center text-white">Caricamento...</div>;
+    if (status === "loading" || !initialFetchDone) return (
+        <div className="min-h-screen bg-blunotte flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-oro/20 border-t-oro rounded-full animate-spin"></div>
+        </div>
+    );
 
     return (
-        <main className="min-h-screen text-white p-6 md:p-12 pt-56 md:pt-44 pb-32 relative">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                {/* Sinistra: Lista Artisti */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="mb-4">
-                        <h1 className="text-4xl font-extrabold tracking-tight mb-2">
-                            {isEditing ? "Gestisci la tua Squadra" : "Crea la tua Squadra"}
+        <main className="min-h-screen pt-44 pb-32 selection:bg-oro/30">
+            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                
+                {/* --- SEZIONE SINISTRA: PICKER --- */}
+                <div className="lg:col-span-8 space-y-12">
+                    <header className="space-y-4">
+                        <span className="text-oro font-black uppercase tracking-[0.4em] text-[10px]">Team Management</span>
+                        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">
+                            {isEditing ? "Gestione" : "Arena"} <span className="text-gradient-oro">Draft</span>
                         </h1>
-                        <p className="text-gray-400">
-                            {isEditing
-                                ? "Modifica i tuoi artisti finché le iscrizioni sono aperte. Solo 5 artisti e max 100 Armoni."
-                                : "Scegli 5 artisti e non superare i 100 Armoni."}
+                        <p className="text-gray-400 max-w-2xl font-light">
+                            {isEditing 
+                                ? "Ottimizza il tuo roster d'elite prima della scadenza. Ricorda: l'Arte non ammette errori."
+                                : "Seleziona i tuoi 5 campioni. Hai 100 Armoni per costruire l'eredità della tua associazione."}
                         </p>
-                    </div>
+                    </header>
 
                     {deadline && (
-                        <div className="mb-8 p-6 bg-[#131d36] rounded-3xl border border-gray-800 shadow-xl overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-oro opacity-5 rounded-full blur-3xl"></div>
-                            <CountdownTimer targetDate={deadline} />
+                        <div className="glass p-8 rounded-[2.5rem] border-white/5 relative overflow-hidden group hover:border-oro/20 transition-all">
+                             <div className="absolute top-0 right-10 text-white/[0.03] font-black text-8xl pointer-events-none group-hover:text-oro/5 transition-colors">TIME</div>
+                             <div className="relative z-10">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-oro animate-pulse block mb-4">Deadline Iscrizioni</span>
+                                <CountdownTimer targetDate={deadline} />
+                             </div>
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         <AnimatePresence>
-                            {artists.map((artist) => {
+                            {artists.map((artist, idx) => {
                                 const isSelected = selectedArtists.some(a => a.id === artist.id);
+                                const isCap = captainId === artist.id;
                                 const canAfford = remainingBudget >= artist.cost || isSelected;
                                 const isDisabled = isExpired || (!canAfford && !isSelected);
 
                                 return (
                                     <motion.div
                                         key={artist.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
                                         layout
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        whileHover={{ scale: isDisabled ? 1 : 1.05 }}
-                                        whileTap={{ scale: isDisabled ? 1 : 0.95 }}
                                         onClick={() => !isDisabled && toggleArtist(artist)}
-                                        className={`rounded-2xl border-2 transition-all p-4 overflow-hidden relative ${isSelected
-                                            ? "bg-[#1f2937] border-oro shadow-[0_0_15px_rgba(255,215,0,0.3)] cursor-pointer"
-                                            : isDisabled
-                                                ? "bg-[#0f172a] border-gray-800 opacity-50 cursor-not-allowed"
-                                                : "bg-[#131d36] border-gray-800 hover:border-gray-500 cursor-pointer"
-                                            }`}
+                                        className={`glass group relative rounded-[2rem] border-2 p-4 transition-all duration-500 overflow-hidden ${
+                                            isSelected 
+                                            ? "border-oro/40 bg-oro/[0.05] shadow-[0_20px_40px_rgba(255,215,0,0.1)] active:scale-95" 
+                                            : isDisabled 
+                                                ? "opacity-30 border-white/5 cursor-not-allowed grayscale" 
+                                                : "border-white/5 hover:border-white/20 cursor-pointer hover:-translate-y-1 active:scale-95"
+                                        }`}
                                     >
-                                        <div className="flex flex-col gap-4">
-                                            <div className="flex justify-between items-start">
-                                                <h3 className="text-xl font-bold truncate pr-2 z-10">{artist.name}</h3>
-                                                <div className="flex flex-col items-end gap-1 z-10">
-                                                    <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${isSelected ? "bg-white/20 text-white" : "bg-gray-800 text-gray-400"}`}>
-                                                        {artist.cost} ARMONI
-                                                    </span>
-                                                    {isSelected && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setCaptainId(artist.id);
-                                                            }}
-                                                            className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${captainId === artist.id
-                                                                ? "bg-oro text-blunotte shadow-[0_0_10px_rgba(255,215,0,0.5)]"
-                                                                : "bg-black/40 text-gray-400 hover:bg-black/60 hover:text-white"
-                                                                }`}
-                                                        >
-                                                            {captainId === artist.id ? "★ Capitano" : "Capitano?"}
-                                                        </button>
-                                                    )}
+                                        <div className="relative h-48 w-full rounded-2xl overflow-hidden mb-4 bg-blunotte">
+                                            <Image 
+                                                src={artist.image || "/fanta-logo.png"} 
+                                                alt={artist.name} 
+                                                fill 
+                                                className={`object-cover transition-all duration-700 ${isSelected ? 'scale-110 opacity-100' : 'opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110'}`} 
+                                            />
+                                            <div className="absolute top-3 right-3 flex flex-col gap-2">
+                                                <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md border ${isSelected ? 'bg-oro text-blunotte border-oro' : 'bg-blunotte/80 text-white/60 border-white/10'}`}>
+                                                    {artist.cost} AR
                                                 </div>
                                             </div>
+                                            {isSelected && (
+                                                <div className="absolute inset-0 border-4 border-oro/40 rounded-2xl pointer-events-none"></div>
+                                            )}
+                                        </div>
 
-                                            {/* Artist Image Preview */}
-                                            <div className="h-40 w-full rounded-xl bg-[#0a0f1c] overflow-hidden">
-                                                {artist.image ? (
-                                                    <img src={artist.image} alt={artist.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-800">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                        </svg>
-                                                    </div>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-start">
+                                                <h3 className={`text-xl font-black ${isSelected ? 'text-oro' : 'text-white'}`}>{artist.name}</h3>
+                                                {isSelected && (
+                                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-oro">
+                                                        <FiCheck size={20} strokeWidth={4} />
+                                                    </motion.div>
                                                 )}
                                             </div>
+
+                                            {isSelected && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setCaptainId(artist.id);
+                                                    }}
+                                                    className={`w-full py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all gap-2 flex items-center justify-center ${
+                                                        isCap 
+                                                        ? "bg-oro text-blunotte shadow-[0_0_15px_rgba(255,215,0,0.4)]" 
+                                                        : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white"
+                                                    }`}
+                                                >
+                                                    <FiZap size={14} className={isCap ? "fill-blunotte" : ""} />
+                                                    {isCap ? "Capitano d'Elite" : "Rendi Capitano"}
+                                                </button>
+                                            )}
                                         </div>
                                     </motion.div>
                                 );
@@ -280,107 +297,139 @@ export default function CreateTeamPage() {
                     </div>
                 </div>
 
-                {/* Destra: Riepilogo (Sticky su Desktop) */}
-                <div className="lg:col-span-1 border-l-0 lg:border-l border-gray-800 pl-0 lg:pl-8">
-                    <div className="sticky top-24 bg-[#131d36] rounded-3xl p-6 shadow-2xl border border-gray-800">
-                        <h2 className="text-2xl font-bold mb-6 border-b border-gray-800 pb-4">Riepilogo</h2>
+                {/* --- SEZIONE DESTRA: RIEPILOGO STICKY --- */}
+                <aside className="lg:col-span-4 lg:sticky lg:top-32 space-y-6">
+                    <div className="glass p-8 rounded-[3rem] border-white/10 shadow-3xl space-y-8">
+                        <header className="pb-6 border-b border-white/5 flex items-center justify-between">
+                            <h2 className="text-2xl font-black uppercase tracking-tighter">Draft Live</h2>
+                            <FiEdit3 className="text-oro" />
+                        </header>
 
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-400 mb-2 uppercase tracking-widest font-bold">Immagine della Squadra</label>
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-20 h-20 rounded-2xl bg-[#0a0f1c] border border-gray-700 overflow-hidden flex items-center justify-center relative shrink-0">
-                                    {teamImage ? (
-                                        <img src={teamImage} alt="Team" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <img src="/fanta-logo.png" alt="Default Logo" className="w-full h-full object-contain p-2 opacity-50" />
-                                    )}
+                        {/* Team Image & Name */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-6">
+                                <div className="relative w-24 h-24 rounded-[1.5rem] overflow-hidden bg-white/5 border border-white/10 shadow-inner group">
+                                    <Image src={teamImage || "/fanta-logo.png"} alt="Squadra" fill className="object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
                                     {isUploading && (
-                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                        <div className="absolute inset-0 bg-blunotte/60 flex items-center justify-center">
+                                            <div className="w-5 h-5 border-2 border-oro/30 border-t-oro rounded-full animate-spin"></div>
                                         </div>
                                     )}
+                                    <label className="absolute inset-0 flex items-center justify-center bg-blunotte/0 hover:bg-blunotte/40 transition-all cursor-pointer group-hover:opacity-100">
+                                        <FiCamera className="text-white opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 transition-all" size={24} />
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading || isExpired} />
+                                    </label>
                                 </div>
-                                <label className="flex-1 flex flex-col items-center justify-center py-2 px-4 bg-gray-800 hover:bg-gray-700 rounded-xl cursor-pointer transition-colors border border-gray-600 text-xs font-bold text-gray-300 gap-1">
-                                    <span>{teamImage ? "Cambia Foto" : "Carica Foto"}</span>
-                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading || isExpired} />
-                                </label>
-                            </div>
-
-                            <label className="block text-sm font-medium text-gray-400 mb-2 uppercase tracking-widest font-bold">Nome Squadra</label>
-                            <input
-                                type="text"
-                                value={teamName}
-                                onChange={(e) => setTeamName(e.target.value)}
-                                maxLength={30}
-                                disabled={isExpired}
-                                placeholder="Es. I Bardi di Piazza"
-                                className="w-full bg-[#0a0f1c] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro transition-colors disabled:opacity-50"
-                            />
-                        </div>
-
-                        <div className="space-y-4 mb-8">
-                            <div className="flex justify-between items-center text-lg">
-                                <span className="text-gray-400">Armoni Totali</span>
-                                <span className={`font-mono font-bold text-2xl ${remainingBudget < 0 ? "text-red-500" : remainingBudget <= 10 ? "text-ocra" : "text-green-500"}`}>
-                                    {remainingBudget} / 100
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center text-lg">
-                                <span className="text-gray-400">Slot</span>
-                                <span className={`font-bold ${selectedArtists.length === 5 ? "text-oro" : "text-white"}`}>
-                                    {selectedArtists.length} / 5
-                                </span>
+                                <div className="flex-grow space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-white/40 tracking-widest">Identità Squadra</label>
+                                    <input 
+                                        type="text" 
+                                        value={teamName}
+                                        onChange={(e) => setTeamName(e.target.value)}
+                                        disabled={isExpired}
+                                        placeholder="Nome Squadra..."
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-oro transition-all font-bold placeholder:text-white/10"
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="space-y-3 min-h-[200px]">
+                        {/* Budget & Slots */}
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-end">
+                                    <span className="text-[10px] font-black uppercase text-white/40 tracking-widest flex items-center gap-2"><FiDollarSign /> Budget Armoni</span>
+                                    <span className={`text-2xl font-black ${remainingBudget < 0 ? 'text-red-500' : 'text-oro'}`}>{remainingBudget}<span className="text-xs text-white/20 ml-1">/100</span></span>
+                                </div>
+                                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div 
+                                        className={`h-full bg-gradient-to-r from-oro to-ocra shadow-[0_0_10px_rgba(255,215,0,0.3)]`}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(spentBudget / 100) * 100}%` }}
+                                        transition={{ duration: 0.5 }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-end">
+                                    <span className="text-[10px] font-black uppercase text-white/40 tracking-widest flex items-center gap-2"><FiLayers /> Slot Artisti</span>
+                                    <span className={`text-2xl font-black ${selectedArtists.length === 5 ? 'text-oro' : 'text-white'}`}>{selectedArtists.length}<span className="text-xs text-white/20 ml-1">/5</span></span>
+                                </div>
+                                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                                     <motion.div 
+                                        className={`h-full bg-gradient-to-r from-viola to-purple-600 shadow-[0_0_10px_rgba(139,92,246,0.3)]`}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(selectedArtists.length / 5) * 100}%` }}
+                                        transition={{ duration: 0.5 }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mini-list Selected */}
+                        <div className="space-y-3 pt-6 border-t border-white/5 min-h-[220px]">
                             {selectedArtists.length === 0 ? (
-                                <p className="text-gray-500 text-center italic mt-10">Nessun artista selezionato</p>
+                                <div className="h-40 flex flex-col items-center justify-center text-white/10 italic text-sm text-center">
+                                    <FiUsers size={32} className="mb-2" />
+                                    <span>Nessun artista selezionato.<br/>Fai le tue scelte.</span>
+                                </div>
                             ) : (
                                 selectedArtists.map(a => (
-                                    <div key={a.id} className="flex justify-between bg-[#0a0f1c] px-4 py-3 rounded-xl text-sm items-center border border-gray-800">
-                                        <span className="font-medium text-gray-200">{a.name}</span>
-                                        <span className="text-oro font-bold text-lg">{a.cost}</span>
-                                    </div>
+                                    <motion.div key={a.id} initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg overflow-hidden relative border border-white/10">
+                                                <Image src={a.image || "/fanta-logo.png"} alt={a.name} fill className="object-cover" />
+                                            </div>
+                                            <span className="text-sm font-bold tracking-tight">{a.name}</span>
+                                            {captainId === a.id && <FiZap className="text-oro" size={12} />}
+                                        </div>
+                                        <span className="text-xs font-black text-oro">{a.cost} AR</span>
+                                    </motion.div>
                                 ))
                             )}
                         </div>
 
-                        {error && <div className="mt-4 p-3 bg-red-900/50 border border-red-500 rounded-xl text-red-200 text-sm">{error}</div>}
+                        {error && (
+                            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl text-xs font-bold text-center flex items-center justify-center gap-2">
+                                <FiInfo /> {error}
+                            </motion.div>
+                        )}
 
                         {!captainId && selectedArtists.length === 5 && (
-                            <p className="mt-4 text-center text-oro text-xs font-bold uppercase tracking-widest animate-pulse">
-                                ⚠️ Scegli un Capitano per continuare
-                            </p>
+                            <div className="text-center text-oro text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">
+                                ★ Seleziona un Capitano per salvare
+                            </div>
                         )}
 
                         <button
                             onClick={saveTeam}
                             disabled={selectedArtists.length !== 5 || !teamName.trim() || !captainId || loading || remainingBudget < 0 || isExpired}
-                            className={`w-full mt-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 shadow-xl
-                                ${isExpired
-                                    ? "bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700"
-                                    : "bg-gradient-to-r from-oro to-ocra text-blunotte hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] disabled:opacity-50 disabled:cursor-not-allowed"
-                                }
-                            `}
+                            className={`w-full py-5 rounded-2xl font-black text-xl uppercase tracking-widest shadow-2xl transition-all relative overflow-hidden group ${
+                                isExpired 
+                                ? "bg-white/5 text-white/20 cursor-not-allowed" 
+                                : "bg-gradient-to-r from-oro to-ocra text-blunotte hover:shadow-[0_20px_40px_rgba(255,215,0,0.3)] hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                            }`}
                         >
-                            {loading ? "Salvataggio..." : isExpired ? "Iscrizioni Chiuse" : (isEditing ? "Salva Modifiche" : "Fonda Squadra")}
+                            <span className="relative z-10">
+                                {loading ? "Salvataggio..." : isExpired ? "Mercato Chiuso" : (isEditing ? "Aggiorna Team" : "Fonda Squadra")}
+                            </span>
+                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
                         </button>
 
                         {isEditing && teamId && (
-                            <div className="mt-8 pt-6 border-t border-gray-800">
-                                <p className="text-[10px] font-black uppercase text-gray-500 mb-4 tracking-[0.2em] text-center">Orgoglioso della tua squadra? Condividila!</p>
+                            <div className="pt-6 border-t border-white/5 space-y-4 text-center">
+                                <span className="text-[10px] uppercase font-black tracking-widest text-white/20 block">Sfida i tuoi amici</span>
                                 <div className="flex justify-center">
                                     <SocialShare
                                         url={`${typeof window !== 'undefined' ? window.location.origin : ''}/team/${teamId}`}
-                                        title={`Ho appena creato la mia squadra ${teamName} su FantaPiazza! Vieni a vederla! 🚀`}
+                                        title={`Ecco la mia squadra ${teamName} su FantaPiazza! Vieni a sfidarmi! 🚀`}
                                     />
                                 </div>
                             </div>
                         )}
                     </div>
-                </div>
-
+                </aside>
             </div>
         </main>
     );

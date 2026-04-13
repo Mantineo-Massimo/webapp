@@ -3,72 +3,53 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-type Sponsor = {
+interface Sponsor {
     id: string;
     name: string;
-    logoUrl: string;
-};
+    logo: string;
+}
 
 export default function SponsorMarquee() {
     const [sponsors, setSponsors] = useState<Sponsor[]>([]);
 
     useEffect(() => {
-        const fetchSponsors = async () => {
-            try {
-                const res = await fetch("/api/sponsors");
-                if (res.ok) {
-                    const data = await res.json();
-                    setSponsors(data);
-                }
-            } catch (err) {
-                console.error("Error fetching sponsors:", err);
-            }
-        };
-        fetchSponsors();
+        fetch("/api/sponsors")
+            .then((res) => res.json())
+            .then((data) => setSponsors(data))
+            .catch((err) => console.error("Error fetching sponsors:", err));
     }, []);
 
     if (sponsors.length === 0) return null;
 
-    return (
-        <div className="w-full py-12 bg-white/2 backdrop-blur-sm border-y border-gray-800/30 overflow-hidden relative group">
-            <div className="flex w-max animate-marquee items-center translate-x-0 h-full">
-                {/* Screen 1 */}
-                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12 h-full">
-                    {sponsors.map((sponsor) => (
-                        <div
-                            key={`${sponsor.id}-1`}
-                            className="flex-shrink-0 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
-                        >
-                            <img
-                                src={sponsor.logoUrl}
-                                alt={sponsor.name}
-                                className="h-10 md:h-12 w-auto object-contain"
-                            />
-                        </div>
-                    ))}
-                </div>
-                {/* Screen 2 - Perfect Duplicate */}
-                <div className="flex shrink-0 w-screen justify-around items-center px-4 md:px-12 h-full">
-                    {sponsors.map((sponsor) => (
-                        <div
-                            key={`${sponsor.id}-2`}
-                            className="flex-shrink-0 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
-                        >
-                            <Image
-                                src={sponsor.logoUrl}
-                                alt={sponsor.name}
-                                width={160}
-                                height={60}
-                                className="h-10 md:h-12 w-auto object-contain"
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
+    // Duplica gli sponsor per far scorrere il marquee senza interruzioni
+    const marqueeSponsors = [...sponsors, ...sponsors, ...sponsors, ...sponsors];
 
-            {/* Gradient Overlays */}
+    return (
+        <div className="relative w-full overflow-hidden py-12">
+            {/* Fade effect edges */}
             <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-blunotte to-transparent z-10 pointer-events-none"></div>
             <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-blunotte to-transparent z-10 pointer-events-none"></div>
+
+            <div className="flex w-fit whitespace-nowrap animate-marquee items-center gap-12 md:gap-24">
+                {marqueeSponsors.map((sponsor, idx) => (
+                    <div
+                        key={`${sponsor.id}-${idx}`}
+                        className="flex-shrink-0 flex flex-col items-center justify-center grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 group"
+                    >
+                        <div className="relative h-12 md:h-20 w-32 md:w-56">
+                            <Image
+                                src={sponsor.logo}
+                                alt={sponsor.name}
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
+                        <span className="mt-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/0 group-hover:text-oro transition-colors">
+                            {sponsor.name}
+                        </span>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
