@@ -8,10 +8,14 @@ import crypto from "crypto";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { email, password, name, surname, phone } = body;
+        const { email, password, confirmPassword, name, surname, phone } = body;
 
         if (!email || !password || !name || !surname) {
             return new NextResponse("Email, password, nome e cognome sono obbligatori.", { status: 400 });
+        }
+
+        if (password !== confirmPassword) {
+            return new NextResponse("Le password non coincidono.", { status: 400 });
         }
 
         const existingUser = await prisma.user.findUnique({

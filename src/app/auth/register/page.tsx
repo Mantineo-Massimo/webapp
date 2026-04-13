@@ -14,6 +14,7 @@ export default function RegisterPage() {
         surname: "", 
         email: "", 
         password: "", 
+        confirmPassword: "",
         phone: "" 
     });
     const [error, setError] = useState("");
@@ -121,12 +122,27 @@ export default function RegisterPage() {
                             required
                         />
                     </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-oro uppercase tracking-widest mb-2">Conferma Password</label>
+                        <input
+                            type="password"
+                            value={data.confirmPassword}
+                            onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
+                            className={`w-full bg-[#0a0f1c] border ${data.confirmPassword && data.password !== data.confirmPassword ? 'border-red-500' : 'border-gray-800'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro focus:ring-1 focus:ring-oro transition-all text-sm`}
+                            placeholder="••••••••"
+                            required
+                        />
+                        {data.confirmPassword && data.password !== data.confirmPassword && (
+                            <p className="text-red-500 text-[10px] mt-1 font-bold italic">Le password non coincidono</p>
+                        )}
+                    </div>
 
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
                     <button
                         type="submit"
-                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-viola to-purple-500 text-white font-bold text-lg hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(88,28,135,0.4)] mt-4"
+                        disabled={data.password !== data.confirmPassword || !data.password}
+                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-viola to-purple-500 text-white font-bold text-lg hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(88,28,135,0.4)] mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Crea Account
                     </button>
