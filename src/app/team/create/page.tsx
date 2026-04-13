@@ -8,6 +8,7 @@ import SocialShare from "@/components/SocialShare";
 import CountdownTimer from "@/components/CountdownTimer";
 import Image from "next/image";
 import { FiCamera, FiCheck, FiInfo, FiLayers, FiDollarSign, FiZap, FiEdit3, FiUsers } from "react-icons/fi";
+import ImageCropper from "@/components/ImageCropper";
 
 type Artist = {
     id: string;
@@ -32,6 +33,10 @@ export default function CreateTeamPage() {
     const [teamId, setTeamId] = useState<string | null>(null);
     const [captainId, setCaptainId] = useState<string | null>(null);
     const [initialFetchDone, setInitialFetchDone] = useState(false);
+    
+    // Image Cropping States
+    const [tempImage, setTempImage] = useState<string | null>(null);
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
     const [deadline, setDeadline] = useState<string | null>(null);
     const [isExpired, setIsExpired] = useState(false);
@@ -115,15 +120,29 @@ export default function CreateTeamPage() {
         }
     };
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        const reader = new FileReader();
+        reader.onload = () => {
+            setTempImage(reader.result as string);
+            setIsCropModalOpen(true);
+        };
+        reader.readAsDataURL(file);
+        
+        // Reset input to allow selecting same file
+        e.target.value = "";
+    };
+
+    const onCropComplete = async (croppedBlob: Blob) => {
+        setIsCropModalOpen(false);
+        setTempImage(null);
         setIsUploading(true);
         setError("");
 
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", croppedBlob, "team-image.jpg");
 
         try {
             const res = await fetch("/api/upload", {
@@ -179,6 +198,8 @@ export default function CreateTeamPage() {
                 const msg = await res.text();
                 setError(msg || "Errore di salvataggio.");
             } else {
+                // Force refresh to clear any stale leaderboards cache
+                router.refresh();
                 router.push("/leaderboards");
             }
         } catch {
@@ -431,6 +452,19 @@ export default function CreateTeamPage() {
                     </div>
                 </aside>
             </div>
+
+            <AnimatePresence>
+                {isCropModalOpen && tempImage && (
+                    <ImageCropper 
+                        image={tempImage} 
+                        onCropComplete={onCropComplete} 
+                        onCancel={() => {
+                            setIsCropModalOpen(false);
+                            setTempImage(null);
+                        }} 
+                    />
+                )}
+            </AnimatePresence>
         </main>
     );
 }

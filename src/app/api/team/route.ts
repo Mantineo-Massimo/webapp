@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, sanitizeInput } from "@/lib/security";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
     try {
@@ -113,6 +114,9 @@ export async function POST(req: Request) {
 
             return newTeam;
         });
+
+        // Revalidate leaderboards to reflect new team immediately
+        revalidatePath("/leaderboards");
 
         return NextResponse.json(team);
 
@@ -250,6 +254,9 @@ export async function PUT(req: Request) {
 
             return team;
         });
+
+        // Revalidate leaderboards to reflect changes immediately
+        revalidatePath("/leaderboards");
 
         return NextResponse.json(updatedTeam);
 

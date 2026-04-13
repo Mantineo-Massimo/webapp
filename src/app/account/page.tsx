@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { FiUser, FiMail, FiLock, FiCheck, FiX, FiActivity, FiShield, FiSave } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiCheck, FiX, FiActivity, FiShield, FiSave, FiCamera } from "react-icons/fi";
+import ImageCropper from "@/components/ImageCropper";
+import Image from "next/image";
 
 export default function AccountPage() {
     const { data: session, update } = useSession();
@@ -16,8 +18,14 @@ export default function AccountPage() {
         name: "",
         surname: "",
         phone: "",
-        email: ""
+        email: "",
+        image: ""
     });
+
+    // Image Upload & Cropping States
+    const [isUploading, setIsUploading] = useState(false);
+    const [tempImage, setTempImage] = useState<string | null>(null);
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
     const [passwords, setPasswords] = useState({
         currentPassword: "",
@@ -33,7 +41,8 @@ export default function AccountPage() {
                     name: data.name || "",
                     surname: data.surname || "",
                     phone: data.phone || "",
-                    email: data.email
+                    email: data.email,
+                    image: data.image || ""
                 });
                 setLoading(false);
             })
@@ -57,7 +66,8 @@ export default function AccountPage() {
                     name: profile.name,
                     surname: profile.surname,
                     phone: profile.phone,
-                    email: profile.email
+                    email: profile.email,
+                    image: profile.image
                 })
             });
 
@@ -114,6 +124,44 @@ export default function AccountPage() {
         }
     };
 
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            setTempImage(reader.result as string);
+            setIsCropModalOpen(true);
+        };
+        reader.readAsDataURL(file);
+        e.target.value = "";
+    };
+
+    const onCropComplete = async (croppedBlob: Blob) => {
+        setIsCropModalOpen(false);
+        setTempImage(null);
+        setIsUploading(true);
+        setError("");
+
+        const formData = new FormData();
+        formData.append("file", croppedBlob, "profile-image.jpg");
+
+        try {
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!res.ok) throw new Error("Upload fallito");
+            const data = await res.json();
+            setProfile(p => ({ ...p, image: data.url }));
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center text-white">
@@ -161,11 +209,31 @@ export default function AccountPage() {
                             <div className="absolute top-0 right-10 text-white/[0.03] font-black text-8xl pointer-events-none">USER</div>
                             
                             <div className="relative z-10 space-y-12">
-                                <div className="flex items-center gap-6 pb-8 border-b border-white/5">
-                                    <div className="w-16 h-16 rounded-2xl bg-oro/10 flex items-center justify-center text-oro border border-oro/20 shadow-xl">
-                                        <FiUser size={32} />
+                                 <div className="flex flex-col md:flex-row items-center gap-10 pb-8 border-b border-white/5">
+                                    <div className="relative group">
+                                        <div className="w-32 h-32 rounded-[2rem] overflow-hidden bg-white/5 border-2 border-oro/30 shadow-2xl relative">
+                                            {profile.image ? (
+                                                <Image src={profile.image} alt="Avatar" fill className="object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-oro/40">
+                                                    <FiUser size={48} />
+                                                </div>
+                                            )}
+                                            {isUploading && (
+                                                <div className="absolute inset-0 bg-blunotte/60 flex items-center justify-center">
+                                                    <div className="w-6 h-6 border-2 border-oro/30 border-t-oro rounded-full animate-spin"></div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-oro text-blunotte rounded-xl flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-all z-20">
+                                            <FiCamera size={18} />
+                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading} />
+                                        </label>
                                     </div>
-                                    <h2 className="text-4xl font-black uppercase tracking-tighter">Profilo <span className="text-oro">Elite</span></h2>
+                                    <div className="text-center md:text-left">
+                                        <h2 className="text-4xl font-black uppercase tracking-tighter">Profilo <span className="text-oro">Elite</span></h2>
+                                        <p className="text-white/20 text-[10px] font-black uppercase tracking-widest mt-2">ID: {session?.user?.id || '...'}</p>
+                                    </div>
                                 </div>
 
                                 <form onSubmit={handleProfileUpdate} className="space-y-8">
@@ -304,6 +372,19 @@ export default function AccountPage() {
                     </p>
                 </div>
             </div>
+
+            <AnimatePresence>
+                {isCropModalOpen && tempImage && (
+                    <ImageCropper 
+                        image={tempImage} 
+                        onCropComplete={onCropComplete} 
+                        onCancel={() => {
+                            setIsCropModalOpen(false);
+                            setTempImage(null);
+                        }} 
+                    />
+                )}
+            </AnimatePresence>
         </main>
     );
 }

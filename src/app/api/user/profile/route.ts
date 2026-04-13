@@ -19,6 +19,7 @@ export async function GET() {
                 surname: true,
                 phone: true,
                 email: true,
+                image: true,
                 role: true,
                 createdAt: true
             }
@@ -43,7 +44,7 @@ export async function PUT(req: Request) {
         }
 
         const body = await req.json();
-        const { name, email, currentPassword, newPassword } = body;
+        const { name, email, currentPassword, newPassword, image } = body;
 
         const user = await prisma.user.findUnique({
             where: { email: session.user.email }
@@ -57,6 +58,7 @@ export async function PUT(req: Request) {
         if (name !== undefined) updateData.name = name;
         if (body.surname !== undefined) updateData.surname = body.surname;
         if (body.phone !== undefined) updateData.phone = body.phone;
+        if (image !== undefined) updateData.image = image;
         if (email && email !== user.email) {
             // Check if email already taken
             const existingEmail = await prisma.user.findUnique({ where: { email } });
@@ -86,6 +88,7 @@ export async function PUT(req: Request) {
                 surname: true,
                 phone: true,
                 email: true,
+                image: true,
                 role: true
             }
         });
