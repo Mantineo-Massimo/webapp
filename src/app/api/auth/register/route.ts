@@ -52,8 +52,11 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({ id: user.id, email: user.email, role: user.role });
-    } catch (error) {
+    } catch (error: any) {
         console.error("REGISTRATION_ERROR", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        return NextResponse.json({ 
+            error: "Errore durante la registrazione",
+            details: error.message
+        }, { status: 500 });
     }
 }
