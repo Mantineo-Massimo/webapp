@@ -55,11 +55,17 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800/30 pt-8 text-center space-y-4">
-                    <p className="text-gray-600 text-[10px] uppercase tracking-widest">
-                        &copy; {new Date().getFullYear()} FantaPiazza. Tutti i diritti riservati.
-                    </p>
+                    <div className="flex flex-col gap-2">
+                        <p className="text-gray-600 text-[10px] uppercase tracking-widest">
+                            &copy; {new Date().getFullYear()} FantaPiazza. Tutti i diritti riservati.
+                        </p>
+                        <p className="text-gray-700 text-[9px] uppercase tracking-[0.2em] font-medium">
+                            Associazione Universitaria MORGANA &bull; C.F. 97103490831
+                        </p>
+                    </div>
                     <div className="flex justify-center gap-6">
                         <Link href="/privacy" className="text-gray-700 hover:text-gray-400 text-[10px] uppercase tracking-widest transition-colors">Privacy Policy</Link>
+                        <Link href="/terms" className="text-gray-700 hover:text-gray-400 text-[10px] uppercase tracking-widest transition-colors">Termini di Servizio</Link>
                     </div>
                 </div>
             </div>

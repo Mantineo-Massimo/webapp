@@ -90,7 +90,11 @@ export default function RegolamentoPage() {
                             </li>
                             <li className="flex gap-3 bg-[#0a0f1c]/50 p-4 rounded-xl border border-gray-800/80">
                                 <span className="text-oro mt-1">✦</span>
-                                <span>L&apos;attribuzione di Bonus e Malus è a totale discrezione dell&apos;amministrazione dell&apos;evento.</span>
+                                <span>La partecipazione è <strong>completamente gratuita</strong> e basata esclusivamente sul merito e sull&apos;abilità critica del giocatore.</span>
+                            </li>
+                            <li className="flex gap-3 bg-[#0a0f1c]/50 p-4 rounded-xl border border-gray-800/80">
+                                <span className="text-oro mt-1">✦</span>
+                                <span>I premi consistono in servizi culturali erogati da partner esterni e non sono convertibili in denaro.</span>
                             </li>
                         </ul>
                     </section>
@@ -166,7 +170,39 @@ export default function RegolamentoPage() {
                     </div>
                 )}
 
+                {/* Note Legali - Sezione Aggiuntiva */}
+                <div className="mt-24 border-t border-gray-800/50 pt-16">
+                    <motion.section 
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        className="bg-[#131d36]/30 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-gray-800/50"
+                    >
+                        <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-white">
+                            <FiInfo className="text-oro" size={24} /> Note Legali
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-sm text-gray-400 leading-relaxed">
+                            <div className="space-y-4">
+                                <p>
+                                    L&apos;iniziativa <strong>Fantarte</strong> è promossa dall&apos;<strong>Associazione Universitaria MORGANA</strong> (C.F. 97103490831), con sede legale in Via Del Vespro n°57 – 98123 Messina (ME).
+                                </p>
+                                <p>
+                                    Il concorso rientra nelle esclusioni previste dall&apos;<strong>Art. 6, comma 1, lett. d) del DPR 430/2001</strong>, in quanto finalizzato alla promozione della cultura artistica e al riconoscimento del merito personale dei partecipanti.
+                                </p>
+                            </div>
+                            <div className="space-y-4">
+                                <p>
+                                    Tutti i premi sono erogati da partner esterni (Sponsor) sotto forma di servizi culturali e non sono convertibili in denaro. Per ogni controversia è competente il <strong>Foro di Messina</strong>.
+                                </p>
+                                <p className="text-gray-600 italic">
+                                    Ultimo aggiornamento del regolamento: {new Date().toLocaleDateString('it-IT')}
+                                </p>
+                            </div>
+                        </div>
+                    </motion.section>
+                </div>
+
             </div>
         </main>
+
     );
 }
