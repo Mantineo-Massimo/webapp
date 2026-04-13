@@ -88,6 +88,9 @@ export default function Footer() {
                         <p className="text-gray-700 text-[8px] font-black uppercase tracking-[0.3em]">
                             Associazione Universitaria MORGANA &bull; Messina
                         </p>
+                        <p className="text-oro/40 text-[8px] font-black uppercase tracking-[0.4em] pt-2">
+                            Fatto per la Piazza dell&apos;Arte da Massimo Mantineo
+                        </p>
                     </div>
                     
                     <div className="flex gap-8">

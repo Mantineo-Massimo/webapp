@@ -56,8 +56,8 @@ export default function LeaderboardsPage() {
 
     useEffect(() => {
         Promise.all([
-            fetch("/api/leaderboards").then(res => res.json()),
-            fetch("/api/artists/leaderboard").then(res => res.json())
+            fetch("/api/leaderboards", { cache: "no-store" }).then(res => res.json()),
+            fetch("/api/artists/leaderboard", { cache: "no-store" }).then(res => res.json())
         ])
             .then(([leaguesData, artistsData]) => {
                 setLeagues(leaguesData);
@@ -150,14 +150,14 @@ export default function LeaderboardsPage() {
                     </div>
                 </div>
 
-                <div className="glass rounded-[3.5rem] border-white/5 overflow-hidden shadow-2xl relative">
+                <div className="glass rounded-3xl md:rounded-[3.5rem] border-white/5 overflow-hidden shadow-2xl relative">
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-white/[0.03] text-gray-400">
-                                    <th className="px-10 py-8 font-black text-[10px] uppercase tracking-[0.2em]">Posizione</th>
-                                    <th className="px-10 py-8 font-black text-[10px] uppercase tracking-[0.2em]">{viewMode === "teams" ? "Squadra" : "Artista"}</th>
-                                    <th className="px-10 py-8 font-black text-[10px] uppercase tracking-[0.2em] text-right">Performance</th>
+                                    <th className="px-4 py-4 md:px-10 md:py-8 font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em]">Pos.</th>
+                                    <th className="px-4 py-4 md:px-10 md:py-8 font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em]">{viewMode === "teams" ? "Squadra" : "Artista"}</th>
+                                    <th className="px-4 py-4 md:px-10 md:py-8 font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-right">Punti</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -187,9 +187,9 @@ export default function LeaderboardsPage() {
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="px-10 py-8">
-                                                    <div className="flex items-center gap-6">
-                                                        <div className="relative w-14 h-14 aspect-square rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-oro/30 transition-all flex-shrink-0">
+                                                <td className="px-4 py-6 md:px-10 md:py-8">
+                                                    <div className="flex items-center gap-3 md:gap-6">
+                                                        <div className="relative w-10 h-10 md:w-14 md:h-14 aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-oro/30 transition-all flex-shrink-0">
                                                             <Image
                                                                 src={t.team.image || "/fanta-logo.png"}
                                                                 alt={t.team.name}
@@ -197,20 +197,20 @@ export default function LeaderboardsPage() {
                                                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                                                             />
                                                         </div>
-                                                        <div>
-                                                            <h3 className="text-xl font-black group-hover:text-oro transition-colors">{t.team.name}</h3>
+                                                        <div className="min-w-0">
+                                                            <h3 className="text-sm md:text-xl font-black group-hover:text-oro transition-colors truncate md:whitespace-normal">{t.team.name}</h3>
                                                             {t.team.user ? (
-                                                                <span className="text-[10px] uppercase font-black tracking-widest text-oro/60">
+                                                                <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-oro/60 block truncate">
                                                                     {t.team.user.name} {t.team.user.surname}
                                                                 </span>
                                                             ) : (
-                                                                <span className="text-[10px] uppercase font-black tracking-widest text-white/20">Manager d&apos;Elite</span>
+                                                                <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-white/20 block">Manager d&apos;Elite</span>
                                                             )}
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-10 py-8 text-right">
-                                                    <span className="text-3xl font-black text-gradient-oro">{t.score} <span className="text-sm font-light text-white/40">pt</span></span>
+                                                <td className="px-4 py-6 md:px-10 md:py-8 text-right">
+                                                    <span className="text-xl md:text-3xl font-black text-gradient-oro whitespace-nowrap">{t.score} <span className="text-[10px] md:text-sm font-light text-white/40">pt</span></span>
                                                 </td>
                                             </motion.tr>
                                         ))
@@ -224,10 +224,10 @@ export default function LeaderboardsPage() {
                                                 onClick={() => handleArtistClick(artist)}
                                                 className="hover:bg-white/[0.05] transition-all cursor-pointer group"
                                             >
-                                                <td className="px-10 py-8">
-                                                    <div className="flex items-center gap-4">
+                                                <td className="px-4 py-6 md:px-10 md:py-8">
+                                                    <div className="flex items-center gap-2 md:gap-4">
                                                         {index < 3 ? (
-                                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg ${
+                                                            <div className={`w-8 h-8 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-sm md:text-xl shadow-lg flex-shrink-0 ${
                                                                 index === 0 ? "bg-gradient-to-br from-yellow-300 to-oro text-blunotte" :
                                                                 index === 1 ? "bg-gradient-to-br from-gray-200 to-gray-400 text-blunotte" :
                                                                 "bg-gradient-to-br from-amber-600 to-ocra text-white"
@@ -235,13 +235,13 @@ export default function LeaderboardsPage() {
                                                                 {index + 1}
                                                             </div>
                                                         ) : (
-                                                            <span className="font-black text-2xl text-white/5 ml-4 group-hover:text-white/20 transition-colors">#{index + 1}</span>
+                                                            <span className="font-black text-lg md:text-2xl text-white/5 md:ml-4 group-hover:text-white/20 transition-colors">#{index + 1}</span>
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="px-10 py-8">
-                                                    <div className="flex items-center gap-6">
-                                                        <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-oro/30 transition-all">
+                                                <td className="px-4 py-6 md:px-10 md:py-8">
+                                                    <div className="flex items-center gap-3 md:gap-6">
+                                                        <div className="relative w-10 h-10 md:w-14 md:h-14 aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-oro/30 transition-all flex-shrink-0">
                                                             <Image
                                                                 src={artist.image || "/fanta-logo.png"}
                                                                 alt={artist.name}
@@ -249,16 +249,16 @@ export default function LeaderboardsPage() {
                                                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                                                             />
                                                         </div>
-                                                        <div>
-                                                            <h3 className="text-xl font-black group-hover:text-oro transition-colors">{artist.name}</h3>
-                                                            <span className="text-[10px] uppercase font-black tracking-widest text-oro/40">
+                                                        <div className="min-w-0">
+                                                            <h3 className="text-sm md:text-xl font-black group-hover:text-oro transition-colors truncate md:whitespace-normal">{artist.name}</h3>
+                                                            <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-oro/40 block truncate">
                                                                 {artist.category || "Artista d'Elite"}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-10 py-8 text-right">
-                                                    <span className="text-3xl font-black text-gradient-oro">{artist.totalScore} <span className="text-sm font-light text-white/40">pt</span></span>
+                                                <td className="px-4 py-6 md:px-10 md:py-8 text-right">
+                                                    <span className="text-xl md:text-3xl font-black text-gradient-oro whitespace-nowrap">{artist.totalScore} <span className="text-[10px] md:text-sm font-light text-white/40">pt</span></span>
                                                 </td>
                                             </motion.tr>
                                         ))
