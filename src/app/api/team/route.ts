@@ -1,10 +1,15 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { checkRateLimit, sanitizeInput } from "@/lib/security";
 
 export async function POST(req: Request) {
     try {
+        const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+        
+        // Rate limit: 5 team actions per hour per IP
+        const allowed = await checkRateLimit(ip, "team_action", 5, 60 * 60 * 1000);
+        if (!allowed) {
+            return NextResponse.json({ error: "Troppe operazioni. Riprova più tardi." }, { status: 429 });
+        }
+
         const session = await getServerSession(authOptions);
         if (!session?.user?.email) {
             return new NextResponse("Unauthorized", { status: 401 });
@@ -20,9 +25,10 @@ export async function POST(req: Request) {
 
         const body = await req.json();
         const { teamName, artistIds, image, captainId } = body;
+        const cleanTeamName = sanitizeInput(teamName);
 
         // Validation
-        if (!teamName || !artistIds || artistIds.length !== 5 || !captainId) {
+        if (!cleanTeamName || !artistIds || artistIds.length !== 5 || !captainId) {
             return new NextResponse("Dati non validi. Nome squadra, 5 artisti e un Capitano sono obbligatori.", { status: 400 });
         }
 
@@ -75,7 +81,7 @@ export async function POST(req: Request) {
             // 1. Create the team
             const newTeam = await tx.team.create({
                 data: {
-                    name: teamName,
+                    name: cleanTeamName,
                     image: image || null,
                     userId: user.id,
                     captainId: captainId || null,
@@ -141,6 +147,14 @@ export async function GET() {
 
 export async function PUT(req: Request) {
     try {
+        const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+        
+        // Rate limit: 5 team actions per hour per IP
+        const allowed = await checkRateLimit(ip, "team_action", 5, 60 * 60 * 1000);
+        if (!allowed) {
+            return NextResponse.json({ error: "Troppe operazioni. Riprova più tardi." }, { status: 429 });
+        }
+
         const session = await getServerSession(authOptions);
         if (!session?.user?.email) {
             return new NextResponse("Unauthorized", { status: 401 });
@@ -156,8 +170,9 @@ export async function PUT(req: Request) {
 
         const body = await req.json();
         const { teamName, artistIds, image, captainId } = body;
+        const cleanTeamName = sanitizeInput(teamName);
 
-        if (!teamName || !artistIds || artistIds.length !== 5 || !captainId) {
+        if (!cleanTeamName || !artistIds || artistIds.length !== 5 || !captainId) {
             return new NextResponse("Dati non validi. Nome squadra, 5 artisti e un Capitano sono obbligatori.", { status: 400 });
         }
 
@@ -195,7 +210,7 @@ export async function PUT(req: Request) {
 
         // Check if name is taken by another team
         const nameInUse = await prisma.team.findUnique({
-            where: { name: teamName }
+            where: { name: cleanTeamName }
         });
         if (nameInUse && nameInUse.id !== existingTeam.id) {
             return new NextResponse("Team name already taken", { status: 409 });
@@ -212,7 +227,7 @@ export async function PUT(req: Request) {
             const team = await tx.team.update({
                 where: { id: existingTeam.id },
                 data: {
-                    name: teamName,
+                    name: cleanTeamName,
                     image: image || null,
                     captainId: captainId || null,
                     artists: {

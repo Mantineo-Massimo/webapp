@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -116,6 +117,15 @@ model News {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   authorId  String?
+}
+
+model ApiRateLimit {
+  id        String   @id @default(uuid())
+  ip        String
+  endpoint  String
+  timestamp DateTime @default(now())
+
+  @@index([ip, endpoint, timestamp])
 }
 
 enum Role {

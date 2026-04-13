@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import crypto from "crypto";
-import { sendEmail } from "@/lib/email";
+import { checkRateLimit } from "@/lib/security";
 
 export async function POST(req: Request) {
     try {
+        const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+
+        // Rate limit: 5 password reset requests per hour per IP
+        const allowed = await checkRateLimit(ip, "forgot_password", 5, 60 * 60 * 1000);
+        if (!allowed) {
+            return NextResponse.json({ error: "Troppi tentativi. Riprova più tardi." }, { status: 429 });
+        }
         const body = await req.json();
         const { email } = body;
 

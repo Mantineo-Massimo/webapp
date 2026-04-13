@@ -15,7 +15,8 @@ export default function RegisterPage() {
         email: "", 
         password: "", 
         confirmPassword: "",
-        phone: "" 
+        phone: "",
+        phone_confirm: "" 
     });
     const [error, setError] = useState("");
 
@@ -97,6 +98,18 @@ export default function RegisterPage() {
                             onChange={(e) => setData({ ...data, phone: e.target.value })}
                             className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro focus:ring-1 focus:ring-oro transition-all text-sm"
                             placeholder="+39 333 1234567"
+                        />
+                    </div>
+
+                    {/* Honeypot Field - Hidden for humans */}
+                    <div style={{ display: 'none' }} aria-hidden="true">
+                        <input
+                            type="text"
+                            name="phone_confirm"
+                            value={data.phone_confirm}
+                            onChange={(e) => setData({ ...data, phone_confirm: e.target.value })}
+                            tabIndex={-1}
+                            autoComplete="off"
                         />
                     </div>
 
