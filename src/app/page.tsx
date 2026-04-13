@@ -15,7 +15,7 @@ export default function Home() {
   const { data: session } = useSession();
   const [deadline, setDeadline] = useState<string | null>(null);
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+  const y1 = useTransform(scrollY, [0, 500], [0, 100]);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -52,7 +52,7 @@ export default function Home() {
               alt="FantaPiazza Logo"
               width={800}
               height={300}
-              className="w-full max-w-4xl mx-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] glow-oro group-hover:scale-105 transition-transform duration-700"
+              className="w-full max-w-3xl mx-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] glow-oro group-hover:scale-105 transition-transform duration-700"
               priority
             />
           </motion.div>

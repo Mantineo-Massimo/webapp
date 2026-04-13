@@ -38,7 +38,7 @@ export default function Navbar() {
     ];
 
     if (status === "authenticated" && session) {
-        navLinks.push({ href: "/team/create", label: "Arena", icon: FiPlus });
+        navLinks.push({ href: "/team/create", label: "Squadra", icon: FiPlus });
         navLinks.push({ href: "/account", label: "Profilo", icon: FiUser });
     }
 

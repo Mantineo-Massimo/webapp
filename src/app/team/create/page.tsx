@@ -201,9 +201,9 @@ export default function CreateTeamPage() {
                 {/* --- SEZIONE SINISTRA: PICKER --- */}
                 <div className="lg:col-span-8 space-y-12">
                     <header className="space-y-4">
-                        <span className="text-oro font-black uppercase tracking-[0.4em] text-[10px]">Team Management</span>
+                        <span className="text-oro font-black uppercase tracking-[0.4em] text-[10px]">Gestione Squadra</span>
                         <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">
-                            {isEditing ? "Gestione" : "Arena"} <span className="text-gradient-oro">Draft</span>
+                            Draft <span className="text-gradient-oro">Squadra</span>
                         </h1>
                         <p className="text-gray-400 max-w-2xl font-light">
                             {isEditing 

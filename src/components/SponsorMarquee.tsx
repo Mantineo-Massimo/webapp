@@ -9,6 +9,35 @@ interface Sponsor {
     logo: string;
 }
 
+function SponsorItem({ sponsor }: { sponsor: Sponsor }) {
+    const [imgError, setImgError] = useState(false);
+
+    return (
+        <div className="flex-shrink-0 flex flex-col items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 group">
+            <div className="relative h-12 md:h-20 w-32 md:w-56 flex items-center justify-center">
+                {!imgError && sponsor.logo ? (
+                    <Image
+                        src={sponsor.logo}
+                        alt={sponsor.name}
+                        fill
+                        className="object-contain"
+                        onError={() => setImgError(true)}
+                    />
+                ) : (
+                    <div className="px-6 py-4 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center">
+                         <span className="text-oro font-black uppercase tracking-widest text-[10px] text-center leading-tight">
+                            {sponsor.name}
+                         </span>
+                    </div>
+                )}
+            </div>
+            <span className="mt-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/0 group-hover:text-oro/40 transition-colors">
+                {sponsor.name}
+            </span>
+        </div>
+    );
+}
+
 export default function SponsorMarquee() {
     const [sponsors, setSponsors] = useState<Sponsor[]>([]);
 
@@ -32,22 +61,7 @@ export default function SponsorMarquee() {
 
             <div className="flex w-fit whitespace-nowrap animate-marquee items-center gap-12 md:gap-24">
                 {marqueeSponsors.map((sponsor, idx) => (
-                    <div
-                        key={`${sponsor.id}-${idx}`}
-                        className="flex-shrink-0 flex flex-col items-center justify-center grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500 group"
-                    >
-                        <div className="relative h-12 md:h-20 w-32 md:w-56">
-                            <Image
-                                src={sponsor.logo}
-                                alt={sponsor.name}
-                                fill
-                                className="object-contain"
-                            />
-                        </div>
-                        <span className="mt-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/0 group-hover:text-oro transition-colors">
-                            {sponsor.name}
-                        </span>
-                    </div>
+                    <SponsorItem key={`${sponsor.id}-${idx}`} sponsor={sponsor} />
                 ))}
             </div>
         </div>
