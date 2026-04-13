@@ -22,7 +22,7 @@ export default function RegolamentoPage() {
     const [activeFilter, setActiveFilter] = useState<RuleCategory>("Tutte");
 
     useEffect(() => {
-        fetch("/api/admin/rules")
+        fetch("/api/rules")
             .then(res => res.json())
             .then(data => {
                 setRulesData(data);
