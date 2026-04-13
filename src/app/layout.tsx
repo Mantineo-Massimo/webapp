@@ -62,17 +62,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-white min-h-screen relative overflow-x-hidden`}
-      >
-        {/* Animated Background Orbs */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute -top-40 -left-64 w-[500px] h-[500px] bg-oro opacity-5 rounded-full blur-[100px] mix-blend-screen" />
-          <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-viola opacity-[0.03] rounded-full blur-[120px] mix-blend-screen" />
-          <div className="absolute -bottom-[10%] left-[20%] w-[400px] h-[400px] bg-ocra opacity-[0.04] rounded-full blur-[90px] mix-blend-screen" />
-        </div>
-
+    <html lang="it" className="dark scroll-smooth">
+      <body className="antialiased selection:bg-oro/30 selection:text-white">
         <NextAuthProvider>
           <div className="relative z-10 font-sans flex flex-col min-h-screen">
             <Navbar />

@@ -1,80 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050810;
+  --foreground: #f8fafc;
+  
+  /* Brand Tokens */
+  --oro: #FFD700;
+  --oro-glow: rgba(255, 215, 0, 0.4);
+  --ocra: #CC7722;
+  --blunotte: #050810;
+  --viola: #5b21b6;
+  --viola-glow: rgba(91, 33, 182, 0.3);
+  
+  /* UI Tokens */
+  --glass-bg: rgba(13, 18, 36, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
-  /* Temi FantaPiazza */
-  --color-oro: #FFD700;
-  --color-ocra: #CC7722;
-  --color-blunotte: #0f172a;
-  --color-viola: #581c87;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: 'Outfit', var(--font-geist-sans), ui-sans-serif, system-ui;
+  
+  --color-oro: var(--oro);
+  --color-ocra: var(--ocra);
+  --color-blunotte: var(--blunotte);
+  --color-viola: var(--viola);
 }
 
 body {
-  background: linear-gradient(rgba(10, 15, 28, 0.85), rgba(10, 15, 28, 0.95)), url('/background.png');
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center;
+  background-color: var(--blunotte);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+/* --- Premium Utilities --- */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+.glass-oro {
+  background: rgba(255, 215, 0, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 215, 0, 0.15);
 }
 
-/* Custom Marquee Animation */
-@keyframes marquee {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
+.text-gradient-oro {
+  background: linear-gradient(135deg, #fff 0%, var(--oro) 50%, var(--ocra) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.animate-marquee {
-  animation: marquee 25s linear infinite;
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 215, 0, 0.2);
+.btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+}
+
+.btn-premium::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.btn-premium:hover::after {
+  opacity: 1;
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Glow effects */
+.glow-oro { filter: drop-shadow(0 0 15px var(--oro-glow)); }
+.glow-viola { filter: drop-shadow(0 0 15px var(--viola-glow)); }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--blunotte);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.1);
   border-radius: 10px;
 }
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 215, 0, 0.4);
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--oro);
 }
