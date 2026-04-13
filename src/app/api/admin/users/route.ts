@@ -46,6 +46,8 @@ export async function PUT(req: Request) {
 
         const updateData: any = {
             name: name !== undefined ? name : undefined,
+            surname: body.surname !== undefined ? body.surname : undefined,
+            phone: body.phone !== undefined ? body.phone : undefined,
             role: role !== undefined ? role : undefined
         };
 

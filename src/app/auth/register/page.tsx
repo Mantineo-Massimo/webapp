@@ -9,7 +9,13 @@ import Image from "next/image";
 
 export default function RegisterPage() {
     const router = useRouter();
-    const [data, setData] = useState({ email: "", password: "" });
+    const [data, setData] = useState({ 
+        name: "", 
+        surname: "", 
+        email: "", 
+        password: "", 
+        phone: "" 
+    });
     const [error, setError] = useState("");
 
     const registerUser = async (e: React.FormEvent) => {
@@ -56,24 +62,62 @@ export default function RegisterPage() {
                     <p className="text-gray-400">Unisciti alle leghe di Morgana e Orum.</p>
                 </div>
 
-                <form onSubmit={registerUser} className="space-y-6 relative z-10">
+                <form onSubmit={registerUser} className="space-y-4 relative z-10">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-[10px] font-bold text-oro uppercase tracking-widest mb-2">Nome</label>
+                            <input
+                                type="text"
+                                value={data.name}
+                                onChange={(e) => setData({ ...data, name: e.target.value })}
+                                className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro focus:ring-1 focus:ring-oro transition-all text-sm"
+                                placeholder="Mario"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-oro uppercase tracking-widest mb-2">Cognome</label>
+                            <input
+                                type="text"
+                                value={data.surname}
+                                onChange={(e) => setData({ ...data, surname: e.target.value })}
+                                className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro focus:ring-1 focus:ring-oro transition-all text-sm"
+                                placeholder="Rossi"
+                                required
+                            />
+                        </div>
+                    </div>
+
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                        <label className="block text-[10px] font-bold text-oro uppercase tracking-widest mb-2">Numero di Telefono</label>
+                        <input
+                            type="tel"
+                            value={data.phone}
+                            onChange={(e) => setData({ ...data, phone: e.target.value })}
+                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro focus:ring-1 focus:ring-oro transition-all text-sm"
+                            placeholder="+39 333 1234567"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-[10px] font-bold text-oro uppercase tracking-widest mb-2">Email</label>
                         <input
                             type="email"
                             value={data.email}
                             onChange={(e) => setData({ ...data, email: e.target.value })}
-                            className="w-full bg-[#0a0f1c] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-viola focus:ring-1 focus:ring-viola transition-all"
+                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro focus:ring-1 focus:ring-oro transition-all text-sm"
+                            placeholder="mario.rossi@esempio.it"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                        <label className="block text-[10px] font-bold text-oro uppercase tracking-widest mb-2">Password</label>
                         <input
                             type="password"
                             value={data.password}
                             onChange={(e) => setData({ ...data, password: e.target.value })}
-                            className="w-full bg-[#0a0f1c] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-viola focus:ring-1 focus:ring-viola transition-all"
+                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-oro focus:ring-1 focus:ring-oro transition-all text-sm"
+                            placeholder="••••••••"
                             required
                         />
                     </div>

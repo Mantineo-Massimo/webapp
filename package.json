@@ -12,7 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-ses": "^3.999.0",
     "@prisma/adapter-pg": "^7.4.1",
-    "@prisma/client": "^7.4.1",
+    "@prisma/client": "^5.15.0",
     "@vercel/blob": "^2.3.0",
     "bcrypt": "^6.0.0",
     "clsx": "^2.1.1",
@@ -35,7 +35,7 @@
     "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "prisma": "^7.4.1",
+    "prisma": "^5.15.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"

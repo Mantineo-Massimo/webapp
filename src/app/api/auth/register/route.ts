@@ -8,10 +8,10 @@ import crypto from "crypto";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { email, password } = body;
+        const { email, password, name, surname, phone } = body;
 
-        if (!email || !password) {
-            return new NextResponse("Email and password are required", { status: 400 });
+        if (!email || !password || !name || !surname) {
+            return new NextResponse("Email, password, nome e cognome sono obbligatori.", { status: 400 });
         }
 
         const existingUser = await prisma.user.findUnique({
@@ -29,7 +29,10 @@ export async function POST(req: Request) {
             data: {
                 email,
                 password: hashedPassword,
-                verificationToken
+                verificationToken,
+                name,
+                surname,
+                phone
             }
         });
 

@@ -14,6 +14,8 @@ export default function AccountPage() {
 
     const [profile, setProfile] = useState({
         name: "",
+        surname: "",
+        phone: "",
         email: ""
     });
 
@@ -29,6 +31,8 @@ export default function AccountPage() {
             .then(data => {
                 setProfile({
                     name: data.name || "",
+                    surname: data.surname || "",
+                    phone: data.phone || "",
                     email: data.email
                 });
                 setLoading(false);
@@ -51,6 +55,8 @@ export default function AccountPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     name: profile.name,
+                    surname: profile.surname,
+                    phone: profile.phone,
                     email: profile.email
                 })
             });
@@ -60,7 +66,7 @@ export default function AccountPage() {
             }
 
             // Update session
-            await update({ name: profile.name });
+            await update({ name: `${profile.name} ${profile.surname}`.trim() });
 
             setSuccess("Profilo aggiornato con successo!");
             setTimeout(() => setSuccess(""), 4000);
@@ -147,15 +153,44 @@ export default function AccountPage() {
                         </h2>
 
                         <form onSubmit={handleProfileUpdate} className="space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Nome</label>
+                                    <div className="relative">
+                                        <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
+                                        <input
+                                            type="text"
+                                            value={profile.name}
+                                            onChange={e => setProfile({ ...profile, name: e.target.value })}
+                                            placeholder="Nome"
+                                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-oro transition-colors"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Cognome</label>
+                                    <div className="relative">
+                                        <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
+                                        <input
+                                            type="text"
+                                            value={profile.surname}
+                                            onChange={e => setProfile({ ...profile, surname: e.target.value })}
+                                            placeholder="Cognome"
+                                            className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-oro transition-colors"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Nome Completo</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Numero di Telefono</label>
                                 <div className="relative">
-                                    <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
+                                    <FiActivity className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
                                     <input
-                                        type="text"
-                                        value={profile.name}
-                                        onChange={e => setProfile({ ...profile, name: e.target.value })}
-                                        placeholder="Il tuo nome..."
+                                        type="tel"
+                                        value={profile.phone}
+                                        onChange={e => setProfile({ ...profile, phone: e.target.value })}
+                                        placeholder="+39..."
                                         className="w-full bg-[#0a0f1c] border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-oro transition-colors"
                                     />
                                 </div>

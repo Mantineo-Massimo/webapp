@@ -16,6 +16,8 @@ export async function GET() {
             select: {
                 id: true,
                 name: true,
+                surname: true,
+                phone: true,
                 email: true,
                 role: true,
                 createdAt: true
@@ -53,6 +55,8 @@ export async function PUT(req: Request) {
 
         const updateData: any = {};
         if (name !== undefined) updateData.name = name;
+        if (body.surname !== undefined) updateData.surname = body.surname;
+        if (body.phone !== undefined) updateData.phone = body.phone;
         if (email && email !== user.email) {
             // Check if email already taken
             const existingEmail = await prisma.user.findUnique({ where: { email } });
@@ -79,6 +83,8 @@ export async function PUT(req: Request) {
             select: {
                 id: true,
                 name: true,
+                surname: true,
+                phone: true,
                 email: true,
                 role: true
             }
