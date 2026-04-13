@@ -33,8 +33,8 @@ export default function Home() {
       {/* --- HERO SECTION --- */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 pb-40">
         {/* Animated Orbs for depth */}
-        <div className="absolute top-[20%] left-[-5%] w-[40%] h-[40%] bg-viola/20 rounded-full blur-[150px] animate-pulse pointer-events-none"></div>
-        <div className="absolute bottom-[20%] right-[-5%] w-[40%] h-[40%] bg-oro/10 rounded-full blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-[20%] left-[-5%] w-[40%] h-[40%] bg-viola/20 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="absolute bottom-[20%] right-[-5%] w-[40%] h-[40%] bg-oro/10 rounded-full blur-[150px] pointer-events-none"></div>
 
         <motion.div 
           style={{ y: y1 }}
@@ -46,13 +46,13 @@ export default function Home() {
             transition={{ duration: 1, ease: "easeOut" }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-oro/20 blur-[100px] rounded-full scale-150 opacity-40 animate-pulse"></div>
+            <div className="absolute inset-0 bg-oro/20 blur-[100px] rounded-full scale-150 opacity-40"></div>
             <Image
               src="/fanta-logo.png"
               alt="FantaPiazza Logo"
               width={500}
               height={180}
-              className="w-full max-w-[280px] md:max-w-md lg:max-w-lg mx-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] glow-oro group-hover:scale-105 transition-transform duration-700"
+              className="w-full max-w-[280px] md:max-w-md lg:max-w-lg mx-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] glow-oro transition-transform duration-700"
               priority
             />
           </motion.div>
@@ -160,35 +160,51 @@ export default function Home() {
            <HowToPlay />
         </section>
 
-        <section className="w-full max-w-7xl mx-auto px-6">
-           <div className="glass p-12 rounded-[3.5rem] border-white/5 overflow-hidden">
-             <NewsSection />
-           </div>
-        </section>
 
         <section className="w-full max-w-7xl mx-auto px-6">
            <motion.div 
              initial={{ opacity: 0, y: 20 }}
              whileInView={{ opacity: 1, y: 0 }}
              viewport={{ once: true }}
-             className="glass p-12 rounded-[4rem] border-white/5 relative overflow-hidden group hover:border-oro/20 transition-all duration-700"
+             className="relative overflow-hidden group rounded-[4rem] border border-white/5 bg-gradient-to-br from-[#00A88E]/10 via-blunotte to-[#F9A01C]/5 transition-all duration-700 hover:border-[#F9A01C]/20"
            >
-             <div className="absolute top-0 right-10 text-white/[0.02] font-black text-9xl pointer-events-none group-hover:text-oro/[0.03] transition-colors">NETWORK</div>
-             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
-               <div className="space-y-6">
-                 <span className="text-oro font-black uppercase tracking-[0.5em] text-[10px]">Partner Istituzionale</span>
-                 <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Piazza dell&apos;<span className="text-gradient-oro">Arte</span></h2>
-                 <p className="text-gray-400 max-w-xl text-lg font-light leading-relaxed">
-                   Scopri l&apos;intero ecosistema di Morgana e O.R.U.M. La Piazza dell&apos;Arte è il cuore pulsante dove la cultura universitaria prende vita.
-                 </p>
+             {/* Decorative Background Elements */}
+             <div className="absolute top-0 right-0 w-64 h-64 bg-[#00A88E]/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+             <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#F9A01C]/5 rounded-full blur-[100px] -ml-32 -mb-32"></div>
+             
+             <div className="relative z-10 p-10 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-12">
+               <div className="flex-shrink-0 w-full max-w-[280px] md:max-w-sm drop-shadow-[0_0_30px_rgba(0,168,142,0.3)]">
+                  <Image 
+                    src="/piazzadellarte.webp" 
+                    alt="Piazza dell'Arte Logo" 
+                    width={500} 
+                    height={300} 
+                    className="w-full h-auto object-contain transition-transform duration-700"
+                  />
                </div>
-               <Link 
-                 href="https://morganaorum.vercel.app/it/network/piazzadellarte"
-                 target="_blank"
-                 className="group/btn relative px-10 py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 hover:-translate-y-1"
-               >
-                 Visita Sito <FiExternalLink className="group-hover/btn:text-oro transition-colors" />
-               </Link>
+
+               <div className="flex-grow space-y-8 text-center lg:text-left">
+                 <div className="space-y-4">
+                   <span className="text-[#00A88E] font-black uppercase tracking-[0.5em] text-[10px]">Partner Istituzionale</span>
+                   <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-tight text-white">
+                      Piazza dell&apos;<span className="text-[#F9A01C]">Arte</span>
+                   </h2>
+                   <p className="text-gray-400 max-w-xl text-lg md:text-xl font-light leading-relaxed italic">
+                     &quot;Il cuore pulsante della creatività studentesca.&quot;
+                   </p>
+                 </div>
+                 
+                 <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
+                    <Link 
+                      href="https://morganaorum.vercel.app/it/network/piazzadellarte"
+                      target="_blank"
+                      className="px-10 py-5 bg-[#F9A01C] text-blunotte font-black rounded-2xl hover:bg-[#FFD100] transition-all flex items-center gap-3 hover:-translate-y-1 shadow-[0_10px_30px_rgba(249,160,28,0.3)] uppercase tracking-widest text-xs"
+                    >
+                      Scopri il Network <FiExternalLink size={18} />
+                    </Link>
+                    <span className="text-white/20 font-black uppercase tracking-widest text-[9px] hidden sm:block">morgana & o.r.u.m.</span>
+                 </div>
+               </div>
              </div>
            </motion.div>
         </section>
