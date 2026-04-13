@@ -179,9 +179,10 @@ export default function Home() {
              viewport={{ once: true }}
              className="relative overflow-hidden group rounded-[4rem] border border-white/5 bg-gradient-to-br from-[#00A88E]/10 via-blunotte to-[#F9A01C]/5 transition-all duration-700 hover:border-[#F9A01C]/20"
            >
-             {/* Decorative Background Elements */}
-             <div className="absolute top-0 right-0 w-64 h-64 bg-[#00A88E]/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
-             <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#F9A01C]/5 rounded-full blur-[100px] -ml-32 -mb-32"></div>
+             {/* Decorative Background Elements based on Logo Colors (Azzurrino P, Verde d, Arancio A) */}
+             <div className="absolute top-0 left-0 w-64 h-64 bg-[#00D2FF]/10 rounded-full blur-[100px] -ml-32 -mt-32"></div>
+             <div className="absolute top-1/2 right-0 w-64 h-64 bg-[#00C853]/10 rounded-full blur-[120px] -mr-32 -translate-y-1/2"></div>
+             <div className="absolute bottom-0 left-1/2 w-64 h-64 bg-[#F9A01C]/10 rounded-full blur-[100px] -translate-x-1/2 -mb-32"></div>
              
              <div className="relative z-10 p-10 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-12">
                <div className="flex-shrink-0 w-full max-w-[280px] md:max-w-sm drop-shadow-[0_0_30px_rgba(0,168,142,0.3)]">
@@ -196,9 +197,9 @@ export default function Home() {
 
                <div className="flex-grow space-y-8 text-center lg:text-left">
                  <div className="space-y-4">
-                   <span className="text-[#00A88E] font-black uppercase tracking-[0.5em] text-[10px]">Partner Istituzionale</span>
-                   <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-tight text-white">
-                      Piazza dell&apos;<span className="text-[#F9A01C]">Arte</span>
+                   <span className="text-[#00D2FF] font-black uppercase tracking-[0.5em] text-[10px]">Evento Principale</span>
+                   <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-tight text-white drop-shadow-[0_10px_30px_rgba(255,255,255,0.1)]">
+                      Piazza dell&apos;Arte
                    </h2>
                    <p className="text-gray-400 max-w-xl text-lg md:text-xl font-light leading-relaxed italic">
                      &quot;Il cuore pulsante della creatività studentesca.&quot;
@@ -211,7 +212,7 @@ export default function Home() {
                       target="_blank"
                       className="px-10 py-5 bg-[#F9A01C] text-blunotte font-black rounded-2xl hover:bg-[#FFD100] transition-all flex items-center gap-3 hover:-translate-y-1 shadow-[0_10px_30px_rgba(249,160,28,0.3)] uppercase tracking-widest text-xs"
                     >
-                      Scopri il Network <FiExternalLink size={18} />
+                      Vai al Sito <FiExternalLink size={18} />
                     </Link>
                     <span className="text-white/20 font-black uppercase tracking-widest text-[9px] hidden sm:block">morgana & o.r.u.m.</span>
                  </div>
