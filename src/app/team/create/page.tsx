@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import SocialShare from "@/components/SocialShare";
 import CountdownTimer from "@/components/CountdownTimer";
 import Image from "next/image";
-import { FiCamera, FiCheck, FiInfo, FiLayers, FiDollarSign, FiZap, FiEdit3 } from "react-icons/fi";
+import { FiCamera, FiCheck, FiInfo, FiLayers, FiDollarSign, FiZap, FiEdit3, FiUsers } from "react-icons/fi";
 
 type Artist = {
     id: string;

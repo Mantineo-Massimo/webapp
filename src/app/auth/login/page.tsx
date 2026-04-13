@@ -101,7 +101,7 @@ export default function LoginPage() {
                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
                                 <FiLock /> Chiave d&apos;Accesso
                             </label>
-                            <Link href="/auth/forgot-password" size="sm" className="text-[10px] text-gray-600 hover:text-oro transition-colors font-black uppercase tracking-widest">
+                            <Link href="/auth/forgot-password" className="text-[10px] text-gray-600 hover:text-oro transition-colors font-black uppercase tracking-widest">
                                 Dimenticata?
                             </Link>
                         </div>
